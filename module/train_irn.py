@@ -8,15 +8,29 @@ from misc import pyutils, torchutils, indexing
 import importlib
 from tqdm import tqdm
 
-def run(args):
+def run(args, crop=False):
 
     path_index = indexing.PathIndex(radius=10, default_size=(args.irn_crop_size // 4, args.irn_crop_size // 4))
 
     model = getattr(importlib.import_module(args.irn_network), 'AffinityDisplacementLoss')(
         path_index)
 
-    train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
-                                                          label_dir=args.ir_label_out_dir,
+    if crop==False:
+    
+        train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
+                                                            label_dir=args.ir_label_out_dir,
+                                                            voc12_root=args.voc12_root,
+                                                            depth_root=args.depth_root,
+                                                            indices_from=path_index.src_indices,
+                                                            indices_to=path_index.dst_indices,
+                                                            hor_flip=True,
+                                                            crop_size=args.irn_crop_size,
+                                                            crop_method="random",
+                                                            rescale=(0.5, 1.5)
+                                                            )
+    else:
+        train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
+                                                          label_dir=args.crop_ir_label_out_dir,
                                                           voc12_root=args.voc12_root,
                                                           depth_root=args.depth_root,
                                                           indices_from=path_index.src_indices,
@@ -110,5 +124,8 @@ def run(args):
 
         model.mean_shift.running_mean = torch.mean(torch.stack(dp_mean_list), dim=0)
     print('done.')
-
-    torch.save(model.state_dict(), args.irn_weights_name + ".pth")
+    if crop==False:
+        torch.save(model.state_dict(), args.irn_weights_name + ".pth")
+    else:
+        torch.save(model.state_dict(), args.crop_irn_weights_name + ".pth")
+        

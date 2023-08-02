@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 cudnn.enabled = True
 
-def _work(model, dataset, args):
+def _work(model, dataset, args, crop):
 
     data_loader = DataLoader(dataset,
                              shuffle=False, num_workers=args.num_workers, pin_memory=False)
@@ -49,17 +49,24 @@ def _work(model, dataset, args):
 
             rw_pred = keys[rw_pred]
 
-            imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
+            if crop==False:
+                imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
+            else:
+                imageio.imsave(os.path.join(args.crop_sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
 
 
-
-def run(args):
+def run(args, crop=False):
     model = getattr(importlib.import_module(args.irn_network), 'EdgeDisplacement')()
-    model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
+    
+    if crop==False:
+        model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
+    else:
+        model.load_state_dict(torch.load(args.crop_irn_weights_name+".pth"), strict=False)
+        
     model.eval()
 
     dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.infer_list,
                                                              voc12_root=args.voc12_root,
                                                              scales=(1.0,))
 
-    _work(model, dataset, args)
+    _work(model, dataset, args, crop)
