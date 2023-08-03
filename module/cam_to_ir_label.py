@@ -10,7 +10,7 @@ import voc12.dataloader
 from misc import torchutils, imutils
 from tqdm import tqdm
 
-def _work(infer_dataset, args, crop):
+def _work(infer_dataset, args):
     infer_data_loader = DataLoader(infer_dataset, shuffle=False, num_workers=0, pin_memory=False)
 
     for iter, pack in enumerate(tqdm(infer_data_loader)):
@@ -37,7 +37,7 @@ def _work(infer_dataset, args, crop):
         conf[fg_conf == 0] = 255
         conf[bg_conf + fg_conf == 0] = 0
 
-        if crop==False:
+        if args.crop==False:
             imageio.imwrite(os.path.join(args.ir_label_out_dir, img_name + '.png'),
                             conf.astype(np.uint8))
         else:
@@ -45,7 +45,7 @@ def _work(infer_dataset, args, crop):
                             conf.astype(np.uint8))
         
 
-def run(args, crop=False):
+def run(args):
     dataset = voc12.dataloader.VOC12ImageDataset(args.trainval_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
-    _work(dataset, args, crop)
+    _work(dataset, args)
     

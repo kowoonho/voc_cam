@@ -9,7 +9,7 @@ def main_process():
         parser = argparse.ArgumentParser()
 
         # Environment
-        parser.add_argument("--num_workers", default=os.cpu_count()//2, type=int)
+        parser.add_argument("--num_workers", default=os.cpu_count(), type=int)
         parser.add_argument("--dataset", default="voc2012", type=str)
 
         # Dataset
@@ -17,7 +17,7 @@ def main_process():
         parser.add_argument("--val_list", default="voc12/val.txt", type=str)
         parser.add_argument("--trainval_list", default="voc12/trainval.txt", type=str)
         parser.add_argument("--voc12_root", default="../Dataset/VOC2012", type=str)
-        parser.add_argument("--depth_root", default="../result/result_img/depth_img")
+        parser.add_argument("--depth_root", default=None)
         parser.add_argument("--cam_root", default="../irn_result/cam")
         parser.add_argument("--infer_list", default="voc12/val.txt", type=str,
                             help="voc12/train_aug.txt to train a fully supervised model, "
@@ -77,11 +77,11 @@ def main_process():
         # step
         parser.add_argument("--train_cam_pass", default=False)
         parser.add_argument("--make_cam_pass", default=True)
-        parser.add_argument("--eval_cam_pass", default=False)
+        parser.add_argument("--eval_cam_pass", default=True)
         parser.add_argument("--cam_to_ir_label_pass", default=True)
         parser.add_argument("--train_irn_pass", default=True)
         parser.add_argument("--make_sem_seg_pass", default=True)
-        parser.add_argument("--eval_sem_seg_pass", default=False)
+        parser.add_argument("--eval_sem_seg_pass", default=True)
         
         
         parser.add_argument("--crop", default=True)
@@ -93,7 +93,7 @@ def main_process():
         
 
         # device
-        parser.add_argument("--device", default="cuda:0", type=str)
+        parser.add_argument("--device", default="cuda:1", type=str)
         
         args = parser.parse_args()
 
@@ -112,12 +112,12 @@ def main_process():
         if args.train_cam_pass:
             import module.train_cam
             
-            module.train_cam.run(args, args.crop)
+            module.train_cam.run(args)
             
         if args.make_cam_pass:
             import module.make_cam
             
-            module.make_cam.run(args, args.crop)
+            module.make_cam.run(args)
             
         if args.eval_cam_pass:
             import module.eval_cam
@@ -127,17 +127,21 @@ def main_process():
         if args.cam_to_ir_label_pass:
             import module.cam_to_ir_label
             
-            module.cam_to_ir_label.run(args, args.crop)
+            module.cam_to_ir_label.run(args)
             
         if args.train_irn_pass:
             import module.train_irn
             
-            module.train_irn.run(args, args.crop)
+            module.train_irn.run(args)
             
         if args.make_sem_seg_pass:
             import module.make_sem_seg_labels
             
             module.make_sem_seg_labels.run(args)
+        if args.eval_sem_seg_pass:
+            import module.eval_sem_seg
+            
+            module.eval_sem_seg.run(args)
             
         
     except KeyboardInterrupt:

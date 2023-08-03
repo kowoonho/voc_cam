@@ -36,11 +36,11 @@ def validate(model, data_loader, args):
     return
 
 
-def run(args, crop=False):
+def run(args):
 
     model = getattr(importlib.import_module(args.cam_network), 'Net')()
 
-    if crop==False:
+    if args.crop==False:
         train_dataset = voc12.dataloader.VOC12ClassificationDataset(args.train_list, voc12_root=args.voc12_root,
                                                                     resize_long=(320, 640), hor_flip=True,
                                                                     crop_size=512, crop_method="random")
@@ -97,7 +97,7 @@ def run(args, crop=False):
         
         validate(model, val_data_loader, args)
     
-    if crop == False:
+    if args.crop == False:
         torch.save(model.state_dict(), args.cam_weights_name + '.pth')
     else:
         torch.save(model.state_dict(), args.crop_cam_weights_name + '.pth')

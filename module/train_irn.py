@@ -8,14 +8,14 @@ from misc import pyutils, torchutils, indexing
 import importlib
 from tqdm import tqdm
 
-def run(args, crop=False):
+def run(args):
 
     path_index = indexing.PathIndex(radius=10, default_size=(args.irn_crop_size // 4, args.irn_crop_size // 4))
 
     model = getattr(importlib.import_module(args.irn_network), 'AffinityDisplacementLoss')(
         path_index)
 
-    if crop==False:
+    if args.crop==False:
     
         train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
                                                             label_dir=args.ir_label_out_dir,
@@ -68,7 +68,8 @@ def run(args, crop=False):
             bg_pos_label = pack['aff_bg_pos_label'].to(args.device)
             fg_pos_label = pack['aff_fg_pos_label'].to(args.device)
             neg_label = pack['aff_neg_label'].to(args.device)
-            depth_tensor = pack['depth'].to(args.device)
+            if args.depth_root:
+                depth_tensor = pack['depth'].to(args.device)
             
             pos_aff_loss, neg_aff_loss, dp_fg_loss, dp_bg_loss = model(img, True)
             
@@ -90,17 +91,12 @@ def run(args, crop=False):
             total_loss.backward()
             optimizer.step()
 
-            if (optimizer.global_step - 1) % 100 == 0:
-                timer.update_progress(optimizer.global_step / max_step)
 
-                print('step:%5d/%5d' % (optimizer.global_step - 1, max_step),
-                      'loss:%.4f %.4f %.4f %.4f' % (
-                      avg_meter.pop('loss1'), avg_meter.pop('loss2'), avg_meter.pop('loss3'), avg_meter.pop('loss4')),
-                      'imps:%.1f' % ((iter + 1) * args.irn_batch_size / timer.get_stage_elapsed()),
-                      'lr: %.4f' % (optimizer.param_groups[0]['lr']),
-                      'etc:%s' % (timer.str_estimated_complete()), flush=True)
-        else:
-            timer.reset_stage()
+        print('step:%5d/%5d' % (optimizer.global_step - 1, max_step),
+                'loss:%.4f %.4f %.4f %.4f' % (
+                avg_meter.pop('loss1'), avg_meter.pop('loss2'), avg_meter.pop('loss3'), avg_meter.pop('loss4')),
+                'imps:%.1f' % ((iter + 1) * args.irn_batch_size / timer.get_stage_elapsed()),
+                'lr: %.4f' % (optimizer.param_groups[0]['lr']))
 
     infer_dataset = voc12.dataloader.VOC12ImageDataset(args.infer_list,
                                                        voc12_root=args.voc12_root,
@@ -124,7 +120,7 @@ def run(args, crop=False):
 
         model.mean_shift.running_mean = torch.mean(torch.stack(dp_mean_list), dim=0)
     print('done.')
-    if crop==False:
+    if args.crop==False:
         torch.save(model.state_dict(), args.irn_weights_name + ".pth")
     else:
         torch.save(model.state_dict(), args.crop_irn_weights_name + ".pth")

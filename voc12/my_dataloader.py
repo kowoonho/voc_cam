@@ -232,6 +232,7 @@ class VOC12CropImageDataset(VO12CamDataset):
         cams = out['cams']
         img = out['img']
         name = out['name']
+        size = img.shape[:2]
         
         crop_images = []
         crop_labels = []
@@ -253,7 +254,7 @@ class VOC12CropImageDataset(VO12CamDataset):
             crop_labels.append(cropped_label)
         
         return {'name' : name, 'img' : img, 'label' : label, 'crop_images' : crop_images,
-                'crop_labels' : crop_labels, 'crop_boxes' : crop_boxes, 'cams' : cams}
+                'crop_labels' : crop_labels, 'crop_boxes' : crop_boxes, 'cams' : cams, 'size' : size}
         
 class VOC12_CropImages(VOC12CropImageDataset):
     def __init__(self, img_name_list_path, voc12_root, cam_root, crop_resize = None, preprocessing = False):

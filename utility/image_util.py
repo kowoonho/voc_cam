@@ -171,9 +171,50 @@ def random_crop(images, cropsize, default_values):
 
 def crop_cam_to_org_cam(crop_cam, crop_box, org_size):
     
+    if crop_box[2] > org_size[1]:
+        crop_box = (crop_box[0], crop_box[1], int(org_size[1].item()), crop_box[3])
+    if crop_box[3] > org_size[0]:
+        crop_box = (crop_box[0], crop_box[1], crop_box[2], int(org_size[0].item()))
+    
+    box_size = (crop_box[2] - crop_box[0], crop_box[3] - crop_box[1])
+
     org_cam = np.zeros((org_size[0], org_size[1]), dtype=crop_cam.dtype)
+    crop_cam = resize_with_interpolation(crop_cam, box_size)
+    
+    
     
     org_cam[crop_box[1]:crop_box[3], crop_box[0]:crop_box[2]] = crop_cam
     
     return org_cam
+
+def resize_bbox(bbox, original_img_size, new_img_size):
+    x1, y1, x2, y2 = bbox
+    original_width, original_height = original_img_size
+    new_width, new_height = new_img_size
+
+    # Calculate the ratio of old size to new size
+    width_ratio = new_width / original_width
+    height_ratio = new_height / original_height
+
+    # Resize the bounding box coordinates
+    x1_new = int(x1 * width_ratio)
+    y1_new = int(y1 * height_ratio)
+    x2_new = int(x2 * width_ratio)
+    y2_new = int(y2 * height_ratio)
+
+    return (x1_new, y1_new, x2_new, y2_new)
+
+def resize_bbox_list(bbox_list, original_img_size, new_img_size):
+    new_bbox_list = []
+    for bbox in bbox_list:
+        new_bbox = resize_bbox(bbox, original_img_size, new_img_size)
+        new_bbox_list.append(new_bbox)
+        
+    return new_bbox_list
+
+def resize_with_interpolation(image, new_size):
+    width, height = new_size
+    resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
+    return resized_image
+    
     

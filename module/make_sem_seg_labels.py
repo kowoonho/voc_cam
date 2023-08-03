@@ -27,11 +27,12 @@ def _work(model, dataset, args, crop):
         for iter, pack in enumerate(tqdm(data_loader)):
             img_name = voc12.dataloader.decode_int_filename(pack['name'][0])
             orig_img_size = np.asarray(pack['size'])
-            print(pack['img'].shape)
             edge, dp = model(pack['img'][0].to(args.device))
             
-            
-            cam_dict = np.load(args.cam_out_dir + '/' + img_name + '.npy', allow_pickle=True).item()
+            if args.crop == False:
+                cam_dict = np.load(args.cam_out_dir + '/' + img_name + '.npy', allow_pickle=True).item()
+            else:
+                cam_dict = np.load(args.crop_cam_out_dir + '/' + img_name + '.npy', allow_pickle=True).item()
 
             cams = cam_dict['cam']
             keys = np.pad(cam_dict['keys'] + 1, (1, 0), mode='constant')
@@ -49,16 +50,16 @@ def _work(model, dataset, args, crop):
 
             rw_pred = keys[rw_pred]
 
-            if crop==False:
+            if args.crop==False:
                 imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
             else:
                 imageio.imsave(os.path.join(args.crop_sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
 
 
-def run(args, crop=False):
+def run(args):
     model = getattr(importlib.import_module(args.irn_network), 'EdgeDisplacement')()
     
-    if crop==False:
+    if args.crop==False:
         model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
     else:
         model.load_state_dict(torch.load(args.crop_irn_weights_name+".pth"), strict=False)
@@ -69,4 +70,4 @@ def run(args, crop=False):
                                                              voc12_root=args.voc12_root,
                                                              scales=(1.0,))
 
-    _work(model, dataset, args, crop)
+    _work(model, dataset, args)
