@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 cudnn.enabled = True
 
-def _work(model, dataset, args, crop):
+def _work(model, dataset, args):
 
     data_loader = DataLoader(dataset,
                              shuffle=False, num_workers=args.num_workers, pin_memory=False)

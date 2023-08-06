@@ -41,7 +41,7 @@ def main_process():
         # Inter-pixel Relation Network (IRNet)
         parser.add_argument("--irn_network", default="net.resnet50_irn", type=str)
         parser.add_argument("--irn_crop_size", default=512, type=int)
-        parser.add_argument("--irn_batch_size", default=32, type=int)
+        parser.add_argument("--irn_batch_size", default=16, type=int)
         parser.add_argument("--irn_num_epoches", default=3, type=int)
         parser.add_argument("--irn_learning_rate", default=0.05, type=float)
         parser.add_argument("--irn_weight_decay", default=1e-4, type=float)
@@ -77,14 +77,14 @@ def main_process():
         # step
         parser.add_argument("--train_cam_pass", default=False)
         parser.add_argument("--make_cam_pass", default=True)
-        parser.add_argument("--eval_cam_pass", default=True)
-        parser.add_argument("--cam_to_ir_label_pass", default=True)
-        parser.add_argument("--train_irn_pass", default=True)
+        parser.add_argument("--eval_cam_pass", default=False)
+        parser.add_argument("--cam_to_ir_label_pass", default=False)
+        parser.add_argument("--train_irn_pass", default=False)
         parser.add_argument("--make_sem_seg_pass", default=True)
         parser.add_argument("--eval_sem_seg_pass", default=True)
         
         
-        parser.add_argument("--crop", default=True)
+        parser.add_argument("--crop", default=False)
         
         
         
@@ -93,7 +93,7 @@ def main_process():
         
 
         # device
-        parser.add_argument("--device", default="cuda:1", type=str)
+        parser.add_argument("--device", default="cuda:0", type=str)
         
         args = parser.parse_args()
 
