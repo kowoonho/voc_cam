@@ -22,7 +22,7 @@ def get_arguments():
     parser.add_argument("--data_root", default=DATA, type=str)
     parser.add_argument("--train_list", default="voc12/trainval.txt", type=str)
     
-    parser.add_argument("--device", default="cuda:1", type=str)
+    parser.add_argument("--device", default="cuda:0", type=str)
     parser.add_argument("--model_type", default="DPT_Hybrid", type=str)
     
     parser.add_argument("--save_path", default="../result/depth_img", type=str)
@@ -32,15 +32,18 @@ def get_arguments():
     os.makedirs(args.save_path, exist_ok=True)
     
     return args
-def depth_normalize(depth_map, num_stages):
-    
-    min_val = np.min(depth_map)
-    max_val = np.max(depth_map)
-    bin_edges = np.linspace(min_val, max_val, num_stages+1)
+def depth_normalize(depth_img):
+    min_val = np.min(depth_img)
+    max_val = np.max(depth_img)
 
-    stage_map = np.digitize(depth_map, bin_edges).astype(float)
-    norm_stage_map = (stage_map - np.min(stage_map)) / (np.max(stage_map) - np.min(stage_map))
-    return norm_stage_map * num_stages
+    # 0에서 1 사이로 정규화
+    depth_img_normalized = (depth_img - min_val) / (max_val - min_val)
+
+    # 0에서 255 사이의 정수로 스케일링
+    depth_img_int = (depth_img_normalized * 255).astype(np.uint8)
+    
+    return depth_img_int
+
 
 def mean_depth(seg_img, depth_img):
     unique_values = np.unique(seg_img)
@@ -94,11 +97,11 @@ if __name__ == '__main__':
             
             depth_img = prediction.cpu().numpy()
 
-            # depth_img = depth_normalize(depth_img, args.depth_stage)
-            
+            depth_img = depth_normalize(depth_img)
             
             save_name = os.path.join(args.save_path, img_id + ".png")
-            cv2.imwrite(save_name, depth_img)
+            imageio.imwrite(save_name, depth_img)
+            # cv2.imwrite(save_name, depth_img)
             
 
         
