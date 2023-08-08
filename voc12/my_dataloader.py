@@ -200,9 +200,9 @@ class VO12CamDataset(VOC12_Dataset):
         out = super().__getitem__(idx)
         name = out['name']
         cam_dict= np.load(os.path.join(self.cam_root, name + ".npy"), allow_pickle=True).item()
-        cams = cam_dict['high_res']
-        
-        out['cams'] = cams
+
+        out['cam'] = cam_dict['cam']
+        out['high_res'] = cam_dict['high_res']
         
         return out
     
@@ -220,7 +220,7 @@ class VOC12CropImageDataset(VO12CamDataset):
         for idx in tqdm(range(len(self.img_name_list))):
             
             out = super().__getitem__(idx)
-            len_val += len(out['cams'])
+            len_val += len(out['cam'])
             self.cam_len_list.append(len_val)
             
         self.cam_len_list = np.asarray(self.cam_len_list)
@@ -229,7 +229,8 @@ class VOC12CropImageDataset(VO12CamDataset):
         out = super().__getitem__(idx)
         
         label = out['label']
-        cams = out['cams']
+        cam = out['cam']
+        high_res = out['high_res']
         img = out['img']
         name = out['name']
         size = img.shape[:2]
@@ -239,9 +240,9 @@ class VOC12CropImageDataset(VO12CamDataset):
         crop_boxes = []
         
         label_cat = np.where(label == 1)[0]
-        for i in range(len(cams)):
+        for i in range(len(high_res)):
             
-            conf_cam = util.find_conf_cam(cams[i])
+            conf_cam = util.find_conf_cam(high_res[i])
             crop_box = util.find_crop_box(conf_cam)
             cropped_img = util.crop_image_with_bounding_box(img, crop_box)
             if self.crop_resize:
@@ -254,7 +255,8 @@ class VOC12CropImageDataset(VO12CamDataset):
             crop_labels.append(cropped_label)
         
         return {'name' : name, 'img' : img, 'label' : label, 'crop_images' : crop_images,
-                'crop_labels' : crop_labels, 'crop_boxes' : crop_boxes, 'cams' : cams, 'size' : size}
+                'crop_labels' : crop_labels, 'crop_boxes' : crop_boxes, 'cam' : cam, 'high_res' : high_res,
+                'size' : size}
         
 class VOC12_CropImages(VOC12CropImageDataset):
     def __init__(self, img_name_list_path, voc12_root, cam_root, crop_resize = None, preprocessing = False):
@@ -322,5 +324,66 @@ class VOC12_CropClassificationDatasetMSF(VOC12CropImageDataset):
 
         return out
         
+class VOC12_GridCropImageDataset(VOC12_Dataset):
+    def __init__(self, img_name_list_path, voc12_root, crop_resize=None, 
+                 img_normal=TorchvisionNormalize(), to_torch=True):
+        super().__init__(img_name_list_path, voc12_root)
+        self.crop_resize = crop_resize
+        self.img_normal = img_normal
+        self.to_torch = to_torch
+        
+    def __getitem__(self, idx):
+        out = super().__getitem__(idx)
+        
+        name = out['name']
+        img = out['img']
+        
+        images = image_util.crop_image(img)
+        
+        out['crop_images'] = images
+        
+        return out
+    
+class VOC12_GridCropImageDatasetMSF(VOC12_GridCropImageDataset):
+    def __init__(self, img_name_list_path, voc12_root, crop_resize=None, scales=(1.0,)):
+        self.scales = scales
+        
+        super().__init__(img_name_list_path, voc12_root, crop_resize)
+        
+    def __getitem__(self, idx):
+        out = super().__getitem__(idx)
+        
+        img = out['img']
+        size = img.shape[:2]
+        crop_images = out['crop_images']
+        crop_size = crop_images[0].shape[:2]
+        msf_img_list = []
+        
+        for crop_img in crop_images:
+            ms_img_list = []
+            for s in self.scales:
+                if s == 1:
+                    s_img = crop_img
+                    
+                else:
+                    s_img = imutils.pil_rescale(crop_img, s, order=3)
 
+                if self.img_normal:
+                    s_img = self.img_normal(s_img)
+                s_img = imutils.HWC_to_CHW(s_img)
+                ms_img_list.append(np.stack([s_img, np.flip(s_img, -1)], axis = 0))
+            if len(self.scales) == 1:
+                ms_img_list = ms_img_list[0]
+                
+            msf_img_list.append(ms_img_list)
+            
+        out['msf'] = msf_img_list
+        out['size'] = size
+        out['crop_size'] = crop_size
+        
+        return out
+        
+            
+        
+        
         

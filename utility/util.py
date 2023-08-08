@@ -234,4 +234,16 @@ def sort_cam(depth_map, cams):
     sorted_idx = np.argsort(mean_depth)[::-1]
     
     return sorted_idx
+
+def normalize(img):
+    min_val = np.min(img)
+    max_val = np.max(img)
+
+    # 0에서 1 사이로 정규화
+    img_normalized = (img - min_val) / (max_val - min_val)
+
+    # 0에서 255 사이의 정수로 스케일링
+    img_int = (img_normalized * 255).astype(np.uint8)
+    
+    return img_int
     

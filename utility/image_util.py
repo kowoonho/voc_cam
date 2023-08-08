@@ -216,5 +216,82 @@ def resize_with_interpolation(image, new_size):
     width, height = new_size
     resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
     return resized_image
+
+def generate_random_color():
+    # Generate random values for each RGB component
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+
+    # Create a NumPy array with the RGB values
+    color = np.array([red, green, blue], dtype=np.uint8)
+
+    return color
+    
+def random_color_mask(mask):
+    (w, h) = mask.shape
+    gen_mask = np.zeros((w, h, 3), dtype=np.uint8)
+    
+    unique_values = np.unique(mask)
+    
+    for value in unique_values:
+        if value == 0: continue
+        random_color = generate_random_color()
+        index = np.where(mask == value)
+        gen_mask[index] = random_color
+    
+    return gen_mask
+
+def crop_image(image): # numpy image cropping
+    w, h = image.shape[:2]
+    
+    crop_images = []
+    
+    w_stride = w // 2
+    h_stride = h // 2
+    
+    w_idx = [0, w_stride, w_stride*2]
+    h_idx = [0, h_stride, h_stride*2]
+    
+    for i in range(2):
+        for j in range(2):
+            crop_images.append(image[w_idx[i]:w_idx[i+1], h_idx[j]:h_idx[j+1]])
+
+    center_image = image[w//4:w//4 + w//2, h//4:h//4 + h//2]
+    crop_images.append(center_image)
+    
+    return crop_images    
+
+def merge_images(images, org_size):
+    w, h = tuple(t.item() for t in org_size)
+    
+    
+    if images[0].shape[0] < 20: # (C, H, W) => (H, W, C)
+        for i in range(len(images)):
+            images[i] = CHW_to_HWC(images[i])
+    
+    crop_w, crop_h = images[0].shape[:2]
+            
+    top = np.hstack((images[0], images[1]))
+    bottom = np.hstack((images[2], images[3]))
+    merge_image = np.vstack((top, bottom))
+    
+    merge_image = cv2.resize(merge_image, (h, w), interpolation=cv2.INTER_LINEAR)
+    if len(merge_image.shape) == 2:
+        merge_image = merge_image[:, :, np.newaxis]
+    
+    center_idx = [w//4, h//4, w//4 + crop_w, h//4 + crop_h]
+
+    merge_image[center_idx[0]:center_idx[2], center_idx[1]:center_idx[3]] = (merge_image[center_idx[0]:center_idx[2], center_idx[1]:center_idx[3]] + images[4]) / 2
+    
+    final_image = HWC_to_CHW(merge_image)
+    
+    
+    return final_image
+    
+    
+    
+    
+    
     
     

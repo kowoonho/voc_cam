@@ -12,6 +12,8 @@ import imageio
 import voc12.dataloader
 from misc import torchutils, indexing
 from tqdm import tqdm
+import cv2
+from utility import util
 
 cudnn.enabled = True
 
@@ -54,6 +56,25 @@ def _work(model, dataset, args):
                 imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
             else:
                 imageio.imsave(os.path.join(args.crop_sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
+                
+def edge_work(model, dataset, args):
+
+    data_loader = DataLoader(dataset,
+                             shuffle=False, num_workers=args.num_workers, pin_memory=False)
+
+    with torch.no_grad():
+
+        model.to(args.device)
+
+        for iter, pack in enumerate(tqdm(data_loader)):
+            img_name = voc12.dataloader.decode_int_filename(pack['name'][0])
+            orig_img_size = np.asarray(pack['size'])
+            edge, dp = model(pack['img'][0].to(args.device))
+            
+            edge = edge[0].cpu().numpy()
+            edge_norm = util.normalize(edge)
+            
+            imageio.imsave(os.path.join(args.edge_out_dir, img_name + ".png"), edge_norm)
 
 
 def run(args):
@@ -69,5 +90,9 @@ def run(args):
     dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.infer_list,
                                                              voc12_root=args.voc12_root,
                                                              scales=(1.0,))
-
-    _work(model, dataset, args)
+    if args.edge:
+        edge_work(model, dataset, args)
+    else:
+        _work(model, dataset, args)
+    
+    

@@ -29,8 +29,8 @@ def run(args):
     fp = 1. - gtj / denominator
     fn = 1. - resj / denominator
     iou = gtjresj / denominator
-    print(eval_semantic_segmentation(preds, labels))
-    # print(fp[0], fn[0])
-    # print(np.mean(fp[1:]), np.mean(fn[1:]))
+    # print(eval_semantic_segmentation(preds, labels))
+    # print(fp, fn)
+    print({'fp' : np.mean(fp[1:]), 'fn' : np.mean(fn[1:])})
 
-    # print({'iou': iou, 'miou': np.nanmean(iou)})
+    print({'iou': iou, 'miou': np.nanmean(iou)})

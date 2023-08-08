@@ -64,12 +64,14 @@ def main_process():
         parser.add_argument("--irn_weights_name", default="../sess/voc_sess/resnet50_irn", type=str)
         parser.add_argument("--crop_irn_weights_name", default="../sess/voc_sess/resnet50_crop_irn", type=str)
         
+        parser.add_argument("--grid_cam_out_dir", default="../irn_result/grid_cam", type=str)
         parser.add_argument("--crop_cam_out_dir", default="../irn_result/crop_cam", type=str)
         parser.add_argument("--cam_out_dir", default="../irn_result/cam", type=str)
         parser.add_argument("--ir_label_out_dir", default="../irn_result/ir_label", type=str)
         parser.add_argument("--crop_ir_label_out_dir", default="../irn_result/crop_ir_label", type=str)
         parser.add_argument("--sem_seg_out_dir", default="../irn_result/sem_seg", type=str)
         parser.add_argument("--crop_sem_seg_out_dir", default="../irn_result/crop_sem_seg", type=str)
+        parser.add_argument("--edge_out_dir", default="../result/edge_map", type=str)
         
 
         
@@ -79,12 +81,14 @@ def main_process():
         parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=False)
-        parser.add_argument("--train_irn_pass", default=True)
+        parser.add_argument("--train_irn_pass", default=False)
         parser.add_argument("--make_sem_seg_pass", default=True)
         parser.add_argument("--eval_sem_seg_pass", default=True)
         
         
         parser.add_argument("--crop", default=True)
+        parser.add_argument("--grid", default=False)
+        parser.add_argument("--edge", default=False)
         
         
         
@@ -98,12 +102,15 @@ def main_process():
         args = parser.parse_args()
 
         os.makedirs("../sess", exist_ok=True)
+        os.makedirs(args.grid_cam_out_dir, exist_ok=True)
         os.makedirs(args.crop_cam_out_dir, exist_ok=True)
         os.makedirs(args.cam_out_dir, exist_ok=True)
         os.makedirs(args.ir_label_out_dir, exist_ok=True)
         os.makedirs(args.crop_ir_label_out_dir, exist_ok=True)
         os.makedirs(args.sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.crop_sem_seg_out_dir, exist_ok=True)
+        os.makedirs(args.edge_out_dir, exist_ok=True)
+    
         
 
         pyutils.Logger(args.log_name + '.log')
