@@ -71,6 +71,7 @@ def main_process():
         parser.add_argument("--crop_ir_label_out_dir", default="../irn_result/crop_ir_label", type=str)
         parser.add_argument("--sem_seg_out_dir", default="../irn_result/sem_seg", type=str)
         parser.add_argument("--crop_sem_seg_out_dir", default="../irn_result/crop_sem_seg", type=str)
+        parser.add_argument("--edge_sem_seg_out_dir", default="../irn_result/edge_sem_seg", type=str)
         parser.add_argument("--edge_out_dir", default="../result/edge_map", type=str)
         
 
