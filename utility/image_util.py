@@ -26,10 +26,23 @@ def image_show(*files, mode='L', idx=(1, 1)):
     ax = []
     
     for i, file in enumerate(files):
-        if isinstance(file, np.ndarray) == False:
+        if isinstance(file, str) == True:
             img = read_image(file, mode)
+        elif isinstance(file, torch.Tensor) == True:
+            img = file
+            if img.shape[0] == 3:
+                img = CHW_to_HWC(np.asarray(img))
+            elif img.shape[0] == 1:
+                img = np.asarray(img)[0]
+            else:
+                img = np.asarray(img)
         else:
             img = file
+            if img.shape[0] == 3:
+                img = CHW_to_HWC(img)
+            elif img.shape[0] == 1:
+                img = img[0]
+                
         ax.append(fig.add_subplot(idx[0], idx[1], i + 1))
         ax[i].imshow(img)
         ax[i].axis('off')

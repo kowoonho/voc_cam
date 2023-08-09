@@ -87,12 +87,17 @@ def run(args):
         
     model.eval()
 
-    dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.infer_list,
+    if args.edge:
+        dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.trainval_list,
                                                              voc12_root=args.voc12_root,
                                                              scales=(1.0,))
-    if args.edge:
+    
         edge_work(model, dataset, args)
     else:
+        dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.infer_list,
+                                                             voc12_root=args.voc12_root,
+                                                             scales=(1.0,))
+    
         _work(model, dataset, args)
     
     
