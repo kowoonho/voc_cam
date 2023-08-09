@@ -241,9 +241,28 @@ def normalize(img):
 
     # 0에서 1 사이로 정규화
     img_normalized = (img - min_val) / (max_val - min_val)
+    
+    return img_normalized
+
+def normalize_int(img):
+    img_normalized = normalize(img)
 
     # 0에서 255 사이의 정수로 스케일링
     img_int = (img_normalized * 255).astype(np.uint8)
     
     return img_int
+
+
+def depth_to_edge(depth_map, threshold=15):
+    
+    grad_x = cv2.Sobel(depth_map, cv2.CV_64F, 1, 0, ksize=3)
+    grad_y = cv2.Sobel(depth_map, cv2.CV_64F, 0, 1, ksize=3)
+
+    magnitude = cv2.magnitude(grad_x, grad_y)
+
+    _, edge_map = cv2.threshold(magnitude, threshold, 255, cv2.THRESH_BINARY)
+    
+    return edge_map
+
+
     
