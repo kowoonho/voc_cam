@@ -17,7 +17,7 @@ def main_process():
         parser.add_argument("--val_list", default="voc12/val.txt", type=str)
         parser.add_argument("--trainval_list", default="voc12/trainval.txt", type=str)
         parser.add_argument("--voc12_root", default="../Dataset/VOC2012", type=str)
-        parser.add_argument("--depth_root", default=None)
+        parser.add_argument("--depth_root", default="../result/depth_img")
         parser.add_argument("--cam_root", default="../irn_result/cam")
         parser.add_argument("--infer_list", default="voc12/val.txt", type=str,
                             help="voc12/train_aug.txt to train a fully supervised model, "
@@ -89,11 +89,11 @@ def main_process():
         
         parser.add_argument("--crop", default=False)
         parser.add_argument("--grid", default=False)
-        parser.add_argument("--edge", default=True)
+        parser.add_argument("--edge", default=False)
         
 
         # device
-        parser.add_argument("--device", default="cuda:1", type=str)
+        parser.add_argument("--device", default="cuda:0", type=str)
         
         args = parser.parse_args()
 
@@ -105,6 +105,7 @@ def main_process():
         os.makedirs(args.crop_ir_label_out_dir, exist_ok=True)
         os.makedirs(args.sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.crop_sem_seg_out_dir, exist_ok=True)
+        os.makedirs(args.edge_sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.edge_out_dir, exist_ok=True)
     
         
