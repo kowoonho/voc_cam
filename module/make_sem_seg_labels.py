@@ -68,8 +68,8 @@ def edge_work(model, dataset, args):
         model.to(args.device)
 
         for iter, pack in enumerate(tqdm(data_loader)):
-            name = pack['name']
-            org_img_size = pack['size'][0]
+            name = pack['name'][0]
+            org_img_size = pack['size']
 
             strided_size = imutils.get_strided_size(org_img_size, 4)
 
