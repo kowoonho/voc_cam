@@ -91,11 +91,6 @@ def main_process():
         parser.add_argument("--grid", default=False)
         parser.add_argument("--edge", default=True)
         
-        
-        
-        
-        
-        
 
         # device
         parser.add_argument("--device", default="cuda:1", type=str)
