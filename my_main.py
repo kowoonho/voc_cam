@@ -68,6 +68,7 @@ def main_process():
         parser.add_argument("--irn_weights_name", default="../sess/voc_sess/resnet50_irn", type=str)
         parser.add_argument("--crop_irn_weights_name", default="../sess/voc_sess/resnet50_crop_irn", type=str)
         
+        parser.add_argument("--rgbd_cam_out_dir", default="../irn_result/rgbd_cam", type=str)
         parser.add_argument("--grid_cam_out_dir", default="../irn_result/grid_cam", type=str)
         parser.add_argument("--crop_cam_out_dir", default="../irn_result/crop_cam", type=str)
         parser.add_argument("--cam_out_dir", default="../irn_result/cam", type=str)
@@ -102,6 +103,7 @@ def main_process():
         args = parser.parse_args()
 
         os.makedirs("../sess", exist_ok=True)
+        os.makedirs(args.rgbd_cam_out_dir, exist_ok=True)
         os.makedirs(args.grid_cam_out_dir, exist_ok=True)
         os.makedirs(args.crop_cam_out_dir, exist_ok=True)
         os.makedirs(args.cam_out_dir, exist_ok=True)

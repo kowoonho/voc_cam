@@ -483,5 +483,32 @@ class VOC12_DepthClassificationDataset(VOC12_DepthDataset):
         return {'name' : out['name'], 'img' : rgbd_img, 'label' : label}
         
 
+class VOC12_DepthClassificationDatasetMSF(VOC12_DepthClassificationDataset):
+    def __init__(self, img_name_list_path, voc12_root, depth_root, img_normal=TorchvisionNormalize(),
+                 scales=(1.0,)):
+        self.scales = scales
+        super().__init__(img_name_list_path, voc12_root, depth_root, img_normal=img_normal)
         
+    def __getitem__(self, idx):
+        name = self.img_name_list[idx]
+
+        img = image_util.read_image(os.path.join(self.voc12_root, "JPEGImages", name+".jpg"))
+        depth = image_util.read_image(os.path.join(self.depth_root, name+".png"))
+        rgbd = np.concatenate((img, np.expand_dims(depth, axis = -1)), axis = -1)
         
+
+        ms_img_list = []
+        for s in self.scales:
+            if s == 1:
+                s_img = rgbd
+            else:
+                s_img = imutils.pil_rescale(rgbd, s, order=3)
+            s_img = self.img_normal(s_img)
+            s_img = imutils.HWC_to_CHW(s_img)
+            ms_img_list.append(np.stack([s_img, np.flip(s_img, -1)], axis=0))
+        if len(self.scales) == 1:
+            ms_img_list = ms_img_list[0]
+
+        out = {"name": name, "img": ms_img_list, "size": (img.shape[0], img.shape[1]),
+               "label": torch.from_numpy(self.label_list[idx])}
+        return out
