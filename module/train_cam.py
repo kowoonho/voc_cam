@@ -52,6 +52,7 @@ def run(args):
         val_dataset = voc12.my_dataloader.VOC12_CropImages(args.val_list, voc12_root = args.voc12_root, 
                                                              cam_root = args.cam_root, preprocessing=True)
     else:
+        print("RGBD!")
         train_dataset = voc12.my_dataloader.VOC12_DepthClassificationDataset(args.train_list, voc12_root=args.voc12_root,
                                                                              depth_root=args.depth_root,
                                                                              resize_long=(320, 640), hor_flip=True,

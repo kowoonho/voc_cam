@@ -478,10 +478,9 @@ class VOC12_DepthClassificationDataset(VOC12_DepthDataset):
         if self.to_torch:
             rgbd_img = imutils.HWC_to_CHW(rgbd_img)
         
-        out['rgbd'] = rgbd_img
-        out['label'] = torch.from_numpy(out['label'])
+        label = torch.from_numpy(out['label'])
         
-        return out
+        return {'name' : out['name'], 'img' : rgbd_img, 'label' : label}
         
 
         
