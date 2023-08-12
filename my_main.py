@@ -23,13 +23,13 @@ def main_process():
                             help="voc12/train_aug.txt to train a fully supervised model, "
                                 "voc12/train.txt or voc12/val.txt to quickly check the quality of the labels.")
         parser.add_argument("--chainer_eval_set", default="train", type=str)
-        parser.add_argument("--rgbd", default=False, type=str)
+        parser.add_argument("--rgbd", default=True, type=str)
         
 
         # Class Activation Map
         parser.add_argument("--cam_network", default="net.resnet50_cam", type=str)
         parser.add_argument("--cam_batch_size", default=32, type=int)
-        parser.add_argument("--cam_num_epoches", default=5, type=int)
+        parser.add_argument("--cam_num_epoches", default=50, type=int)
         parser.add_argument("--cam_learning_rate", default=0.05, type=float)
         parser.add_argument("--cam_weight_decay", default=1e-4, type=float)
         parser.add_argument("--cam_eval_thres", default=0.15, type=float)
@@ -63,7 +63,7 @@ def main_process():
         parser.add_argument("--log_name", default="sample_train_eval", type=str)
         parser.add_argument("--cam_weights_name", default="../sess/voc_sess/resnet50_cam", type=str)
         parser.add_argument("--crop_cam_weights_name", default="../sess/voc_sess/resnet50_crop_cam", type=str)
-        parser.add_argument("--rgbd_weights_name", default="../sess/voc_sess/resnet50_rgbd_cam", type=str)
+        parser.add_argument("--rgbd_cam_weights_name", default="../sess/voc_sess/resnet50_rgbd_cam", type=str)
         
         parser.add_argument("--irn_weights_name", default="../sess/voc_sess/resnet50_irn", type=str)
         parser.add_argument("--crop_irn_weights_name", default="../sess/voc_sess/resnet50_crop_irn", type=str)

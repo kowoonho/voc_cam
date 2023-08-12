@@ -31,7 +31,7 @@ def validate(model, data_loader, args):
 
     model.train()
 
-    print('loss: %.4f' % (val_loss_meter.pop('loss1')))
+    print('loss: %.4f' % (loss1.item()))
 
     return
 
@@ -99,7 +99,7 @@ def run(args):
             optimizer.step()
 
         print('step:%5d/%5d' % (optimizer.global_step - 1, max_step),
-                'loss:%.4f' % (avg_meter.pop('loss1')),
+                'loss:%.4f' % (loss1.item()),
                 'imps:%.1f' % ((step + 1) * args.cam_batch_size / timer.get_stage_elapsed()),
                 'lr: %.4f' % (optimizer.param_groups[0]['lr']))
 
