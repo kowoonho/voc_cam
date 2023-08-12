@@ -63,6 +63,8 @@ def main_process():
         parser.add_argument("--log_name", default="sample_train_eval", type=str)
         parser.add_argument("--cam_weights_name", default="../sess/voc_sess/resnet50_cam", type=str)
         parser.add_argument("--crop_cam_weights_name", default="../sess/voc_sess/resnet50_crop_cam", type=str)
+        parser.add_argument("--rgbd_weights_name", default="../sess/voc_sess/resnet50_rgbd_cam", type=str)
+        
         parser.add_argument("--irn_weights_name", default="../sess/voc_sess/resnet50_irn", type=str)
         parser.add_argument("--crop_irn_weights_name", default="../sess/voc_sess/resnet50_crop_irn", type=str)
         
@@ -80,7 +82,7 @@ def main_process():
         
 
         # step
-        parser.add_argument("--train_cam_pass", default=False)
+        parser.add_argument("--train_cam_pass", default=True)
         parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=False)
