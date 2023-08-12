@@ -191,7 +191,7 @@ class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
                "label": torch.from_numpy(self.label_list[idx])}
         return out
     
-class VO12CamDataset(VOC12_Dataset):
+class VOC12CamDataset(VOC12_Dataset):
     def __init__(self, img_name_list_path, voc12_root, cam_root):
         super().__init__(img_name_list_path, voc12_root)
         self.cam_root = cam_root
@@ -206,7 +206,7 @@ class VO12CamDataset(VOC12_Dataset):
         
         return out
     
-class VOC12CropImageDataset(VO12CamDataset):
+class VOC12CropImageDataset(VOC12CamDataset):
     def __init__(self, img_name_list_path, voc12_root, cam_root, crop_resize=None):
         super().__init__(img_name_list_path, voc12_root, cam_root)
     
@@ -383,7 +383,106 @@ class VOC12_GridCropImageDatasetMSF(VOC12_GridCropImageDataset):
         
         return out
         
-            
         
+class VOC12_Depth_Crop(VOC12CamDataset):
+    def __init__(self, img_name_list_path, voc12_root, cam_root, depth_root):
+        super().__init__(img_name_list_path, voc12_root, cam_root)
+        
+        self.depth_root = depth_root
+        
+    def __getitem__(self, idx):
+        out = super().__getitem__(idx)
+        label = out['label']
+        high_res = out['high_res']
+        img = out['img']
+        name = out['name']
+        
+        depth_img = image_util.read_image(os.path.join(self.depth_root, name + ".png"))
+        
+        crop_images = []
+        crop_labels = []
+        crop_boxes = []
+        mean_depths = []
+        
+        label_cat = np.where(label == 1)[0]
+        for i in range(len(high_res)):
+            
+            conf_cam = util.find_conf_cam(high_res[i])
+            crop_box = util.find_crop_box(conf_cam)
+            cropped_img = util.crop_image_with_bounding_box(img, crop_box)
+            mean_depth = util.cam_depth(conf_cam, depth_img)
+            
+            cropped_label = np.zeros(20)
+            cropped_label[label_cat[i]] = 1
+            
+            crop_boxes.append(crop_box)
+            crop_images.append(cropped_img)
+            crop_labels.append(cropped_label)
+            mean_depths.append(mean_depth)
+        
+        out['mean_depths'] = mean_depths
+        out['crop_images'] = crop_images
+        out['crop_labels'] = crop_labels
+        out['crop_boxes'] = crop_boxes
+        return out
+    
+class VOC12_DepthDataset(VOC12_Dataset):
+    def __init__(self, img_name_list_path, voc12_root, depth_root):
+        super().__init__(img_name_list_path, voc12_root)
+        self.depth_root = depth_root
+        
+    def __getitem__(self, idx):
+        out = super().__getitem__(idx)
+        depth_img = image_util.read_image(os.path.join(self.depth_root, out['name'] + ".png"))
+        
+        out['depth'] = depth_img
+        
+        return out
+
+class VOC12_DepthClassificationDataset(VOC12_DepthDataset):
+    def __init__(self, img_name_list_path, voc12_root, depth_root, resize_long=None, rescale=None,
+                 img_normal=TorchvisionNormalize(), hor_flip = False, crop_size=None, crop_method=None, to_torch=True):
+        super().__init__(img_name_list_path, voc12_root, depth_root)
+        self.resize_long = resize_long
+        self.rescale = rescale
+        self.crop_size = crop_size
+        self.img_normal = img_normal
+        self.hor_flip = hor_flip
+        self.crop_method = crop_method
+        self.to_torch = to_torch
+        
+    def __getitem__(self, idx):
+        out = super().__getitem__(idx)
+        depth_expanded = np.expand_dims(out['depth'], axis=-1)
+        rgbd_img = np.concatenate((out['img'], depth_expanded), axis = -1)
+        
+        
+        if self.resize_long:
+            rgbd_img = imutils.random_resize_long(rgbd_img, self.resize_long[0], self.resize_long[1])
+        
+        if self.rescale:
+            rgbd_img = imutils.random_scale(rgbd_img, scale_range=self.rescale, order=3)
+        
+        if self.img_normal:
+            rgbd_img = self.img_normal(rgbd_img)
+        
+        if self.hor_flip:
+            rgbd_img = imutils.random_lr_flip(rgbd_img)
+            
+        if self.crop_size:
+            if self.crop_method == 'random':
+                rgbd_img = imutils.random_crop(rgbd_img, self.crop_size, 0)
+            else:
+                rgbd_img = imutils.top_left_crop(rgbd_img, self.crop_size, 0)
+        
+        if self.to_torch:
+            rgbd_img = imutils.HWC_to_CHW(rgbd_img)
+        
+        out['rgbd'] = rgbd_img
+        out['label'] = torch.from_numpy(out['label'])
+        
+        return out
+        
+
         
         

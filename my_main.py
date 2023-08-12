@@ -23,6 +23,8 @@ def main_process():
                             help="voc12/train_aug.txt to train a fully supervised model, "
                                 "voc12/train.txt or voc12/val.txt to quickly check the quality of the labels.")
         parser.add_argument("--chainer_eval_set", default="train", type=str)
+        parser.add_argument("--rgbd", default=False, type=str)
+        
 
         # Class Activation Map
         parser.add_argument("--cam_network", default="net.resnet50_cam", type=str)

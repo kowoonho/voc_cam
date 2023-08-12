@@ -56,11 +56,15 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1)):
+    def __init__(self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1), rgbd=False):
         self.inplanes = 64
         super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=strides[0], padding=3,
-                               bias=False)
+        if rgbd == True:
+            self.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=strides[0], padding=3,
+                                bias=False)
+        else:
+            self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=strides[0], padding=3,
+                                bias=False)
         self.bn1 = FixedBatchNorm(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
