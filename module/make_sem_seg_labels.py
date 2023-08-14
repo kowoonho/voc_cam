@@ -10,10 +10,11 @@ import os
 import imageio
 
 import voc12.dataloader
-from misc import torchutils, indexing
+from misc import torchutils, indexing, imutils
 from tqdm import tqdm
 import cv2
-from utility import util
+from utility import util, image_util
+
 
 cudnn.enabled = True
 
@@ -67,14 +68,39 @@ def edge_work(model, dataset, args):
         model.to(args.device)
 
         for iter, pack in enumerate(tqdm(data_loader)):
-            img_name = voc12.dataloader.decode_int_filename(pack['name'][0])
-            orig_img_size = np.asarray(pack['size'])
-            edge, dp = model(pack['img'][0].to(args.device))
+            name = pack['name'][0]
+            org_img_size = pack['size']
+
+            strided_size = imutils.get_strided_size(org_img_size, 4)
+
+            depth_map = image_util.read_image(os.path.join(args.depth_root, name+'.png'))
+
+            edge_map = util.depth_to_edge(depth_map)
+            edge_map = util.normalize(edge_map)
+            edge_map = torch.from_numpy(edge_map).unsqueeze(0).to(args.device)
+
+            edge_map = F.interpolate(torch.unsqueeze(edge_map, 0), strided_size, mode='bilinear', align_corners=False)
+
+            cam_dict = np.load(os.path.join(args.cam_out_dir, name + '.npy'), allow_pickle=True).item()
+
+            cams = cam_dict['cam']
+            keys = np.pad(cam_dict['keys'] + 1, (1,0), mode='constant')
+
+            cam_downsized_values = cams.to(args.device)
+
+            rw = indexing.propagate_to_edge(cam_downsized_values, edge_map, beta=args.beta, exp_times=args.exp_times, device=args.device)
+
+            rw_up = F.interpolate(rw, scale_factor=4, mode='bilinear', align_corners=False)[..., 0, :org_img_size[0], :org_img_size[1]]
+            rw_up = rw_up / torch.max(rw_up)
+
+            rw_up_bg = F.pad(rw_up, (0, 0, 0, 0, 1, 0), value=0.25)
+            # rw_up_bg = F.pad(rw_up, (0, 0, 0, 0, 1, 0), value=0)
+            rw_pred = torch.argmax(rw_up_bg, dim=0).cpu().numpy()
+
+            rw_pred = keys[rw_pred]
             
-            edge = edge[0].cpu().numpy()
-            edge_norm = util.normalize(edge)
+            imageio.imsave(os.path.join(args.edge_sem_seg_out_dir, name + '.png'), rw_pred.astype(np.uint8))
             
-            imageio.imsave(os.path.join(args.edge_out_dir, img_name + ".png"), edge_norm)
 
 
 def run(args):

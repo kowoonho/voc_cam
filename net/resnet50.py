@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
-
+import torch
 
 model_urls = {
     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth'
@@ -56,11 +56,19 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1)):
+    def __init__(self, block, layers, strides=(2, 2, 2, 2), dilations=(1, 1, 1, 1), rgbd=False):
         self.inplanes = 64
+        
         super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=strides[0], padding=3,
-                               bias=False)
+        
+        self.rgbd = rgbd
+        if self.rgbd:
+            self.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=strides[0], padding=3,
+                                bias=False)
+        else:
+            self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=strides[0], padding=3,
+                                bias=False)
+            
         self.bn1 = FixedBatchNorm(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -107,13 +115,26 @@ class ResNet(nn.Module):
 
         return x
 
+def modify_conv1_for_rgbd(model):
+    rgb_weights = model.conv1.weight.data
+    avg_weights = torch.mean(rgb_weights, dim=1, keepdim=True)
+    new_weights = torch.cat((rgb_weights, avg_weights), dim=1)
+    model.conv1.weight.data = new_weights
+    return model
 
 def resnet50(pretrained=True, **kwargs):
 
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+
     if pretrained:
         state_dict = model_zoo.load_url(model_urls['resnet50'])
         state_dict.pop('fc.weight')
         state_dict.pop('fc.bias')
+        
+        if model.rgbd == True:
+            modify_conv1_for_rgbd(model)
+            
         model.load_state_dict(state_dict)
+        
     return model
+

@@ -31,27 +31,36 @@ def validate(model, data_loader, args):
 
     model.train()
 
-    print('loss: %.4f' % (val_loss_meter.pop('loss1')))
+    print('loss: %.4f' % (loss1.item()))
 
     return
 
 
 def run(args):
 
-    model = getattr(importlib.import_module(args.cam_network), 'Net')()
+    model = getattr(importlib.import_module(args.cam_network), 'Net')(rgbd=args.rgbd)
 
-    if args.crop==False:
+    if args.crop==False and args.rgbd == False:
         train_dataset = voc12.dataloader.VOC12ClassificationDataset(args.train_list, voc12_root=args.voc12_root,
                                                                     resize_long=(320, 640), hor_flip=True,
                                                                     crop_size=512, crop_method="random")
         val_dataset = voc12.dataloader.VOC12ClassificationDataset(args.val_list, voc12_root=args.voc12_root,
                                                               crop_size=512)
-    else:
+    elif args.crop==True and args.rgbd == False:
         train_dataset = voc12.my_dataloader.VOC12_CropImages(args.train_list, voc12_root = args.voc12_root, 
                                                              cam_root = args.cam_root, preprocessing=True)
         val_dataset = voc12.my_dataloader.VOC12_CropImages(args.val_list, voc12_root = args.voc12_root, 
                                                              cam_root = args.cam_root, preprocessing=True)
-    
+    else:
+        print("RGBD!")
+        train_dataset = voc12.my_dataloader.VOC12_DepthClassificationDataset(args.train_list, voc12_root=args.voc12_root,
+                                                                             depth_root=args.depth_root,
+                                                                             resize_long=(320, 640), hor_flip=True,
+                                                                             crop_size=512, crop_method='random')
+        val_dataset = voc12.my_dataloader.VOC12_DepthClassificationDataset(args.val_list, voc12_root=args.voc12_root,
+                                                                             depth_root=args.depth_root,
+                                                                             resize_long=(320, 640), hor_flip=True,
+                                                                             crop_size=512, crop_method='random')
     
     train_data_loader = DataLoader(train_dataset, batch_size=args.cam_batch_size,
                                    shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
@@ -90,17 +99,19 @@ def run(args):
             optimizer.step()
 
         print('step:%5d/%5d' % (optimizer.global_step - 1, max_step),
-                'loss:%.4f' % (avg_meter.pop('loss1')),
+                'loss:%.4f' % (loss1.item()),
                 'imps:%.1f' % ((step + 1) * args.cam_batch_size / timer.get_stage_elapsed()),
                 'lr: %.4f' % (optimizer.param_groups[0]['lr']))
 
         
         validate(model, val_data_loader, args)
     
-    if args.crop == False:
+    if args.crop == False and args.rgbd == False:
         torch.save(model.state_dict(), args.cam_weights_name + '.pth')
-    else:
+    elif args.crop == True and args.rgbd == False:
         torch.save(model.state_dict(), args.crop_cam_weights_name + '.pth')
+    else:
+        torch.save(model.state_dict(), args.rgbd_cam_weights_name + '.pth')
         
     
     

@@ -41,7 +41,7 @@ def find_center_points(image_array):
     center_points = np.median(points, axis = 0)
     return center_points
 
-def find_threshold(image_array, type = "average", alpha = 0.4):
+def find_threshold(image_array, type = "median", alpha = 1):
     
     image_array = np.where(image_array < 0.1, 0, image_array)
     
@@ -52,7 +52,13 @@ def find_threshold(image_array, type = "average", alpha = 0.4):
     if type == "median":
         threshold = np.median(image_array[nonzero_indices])
     
+    max_value = np.max(image_array[nonzero_indices])
+    min_value = np.min(image_array[nonzero_indices])
+    
+    threshold = min_value + (max_value - min_value) * 0.5
+    
     threshold *= alpha
+    
     return threshold
 
 def find_conf_cam(cam):
@@ -61,7 +67,7 @@ def find_conf_cam(cam):
     
     return conf_cam
 
-def find_crop_box(image_array, margin = 0.3):
+def find_crop_box(image_array, margin = 0.5):
     size = image_array.shape[:2]
     
     nonzero_indices = np.nonzero(image_array)
@@ -76,8 +82,8 @@ def find_crop_box(image_array, margin = 0.3):
     dx = max_x - min_x; dy = max_y - min_y;
     margin_dx = int(dx * margin); margin_dy = int(dy * margin);
     
-    margin_dx = max(margin_dx, 15)
-    margin_dy = max(margin_dy, 15)
+    margin_dx = max(margin_dx, 50)
+    margin_dy = max(margin_dy, 50)
     
     min_x = max(0, min_x - margin_dx)
     min_y = max(0, min_y - margin_dy)
@@ -241,9 +247,37 @@ def normalize(img):
 
     # 0에서 1 사이로 정규화
     img_normalized = (img - min_val) / (max_val - min_val)
+    
+    return img_normalized
+
+def normalize_int(img):
+    img_normalized = normalize(img)
 
     # 0에서 255 사이의 정수로 스케일링
     img_int = (img_normalized * 255).astype(np.uint8)
     
     return img_int
+
+
+def depth_to_edge(depth_map, threshold=15):
+    
+    grad_x = cv2.Sobel(depth_map, cv2.CV_64F, 1, 0, ksize=3)
+    grad_y = cv2.Sobel(depth_map, cv2.CV_64F, 0, 1, ksize=3)
+
+    magnitude = cv2.magnitude(grad_x, grad_y)
+
+    _, edge_map = cv2.threshold(magnitude, threshold, 255, cv2.THRESH_BINARY)
+    
+    return edge_map
+
+def cam_depth(conf_cam, depth_map):
+    indexes = np.where(conf_cam > 0.25)
+    
+    mean_depth = np.average(depth_map[indexes])
+    
+    return mean_depth
+    
+    
+
+
     
