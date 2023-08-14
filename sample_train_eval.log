@@ -1,2 +1,153 @@
-{'num_workers': 24, 'dataset': 'voc2012', 'train_list': 'voc12/train.txt', 'val_list': 'voc12/val.txt', 'trainval_list': 'voc12/trainval.txt', 'voc12_root': '../Dataset/VOC2012', 'depth_root': '../result/depth_img', 'cam_root': '../irn_result/cam', 'infer_list': 'voc12/val.txt', 'chainer_eval_set': 'train', 'rgbd': True, 'cam_network': 'net.resnet50_cam', 'cam_batch_size': 32, 'cam_num_epoches': 50, 'cam_learning_rate': 0.05, 'cam_weight_decay': 0.0001, 'cam_eval_thres': 0.15, 'cam_scales': (1.0, 0.5, 1.5, 2.0), 'conf_fg_thres': 0.3, 'conf_bg_thres': 0.05, 'irn_network': 'net.resnet50_irn', 'irn_crop_size': 512, 'irn_batch_size': 16, 'irn_num_epoches': 5, 'irn_learning_rate': 0.05, 'irn_weight_decay': 0.0001, 'crop_resize': (512, 512), 'beta': 10, 'exp_times': 8, 'ins_seg_bg_thres': 0.25, 'sem_seg_bg_thres': 0.25, 'log_name': 'sample_train_eval', 'cam_weights_name': '../sess/voc_sess/resnet50_cam', 'crop_cam_weights_name': '../sess/voc_sess/resnet50_crop_cam', 'rgbd_cam_weights_name': '../sess/voc_sess/resnet50_rgbd_cam', 'irn_weights_name': '../sess/voc_sess/resnet50_irn', 'crop_irn_weights_name': '../sess/voc_sess/resnet50_crop_irn', 'rgbd_cam_out_dir': '../irn_result/rgbd_cam', 'grid_cam_out_dir': '../irn_result/grid_cam', 'crop_cam_out_dir': '../irn_result/crop_cam', 'cam_out_dir': '../irn_result/cam', 'ir_label_out_dir': '../irn_result/ir_label', 'crop_ir_label_out_dir': '../irn_result/crop_ir_label', 'sem_seg_out_dir': '../irn_result/sem_seg', 'crop_sem_seg_out_dir': '../irn_result/crop_sem_seg', 'edge_sem_seg_out_dir': '../irn_result/edge_sem_seg', 'edge_out_dir': '../result/edge_map', 'train_cam_pass': False, 'make_cam_pass': True, 'eval_cam_pass': False, 'cam_to_ir_label_pass': False, 'train_irn_pass': False, 'make_sem_seg_pass': False, 'eval_sem_seg_pass': False, 'crop': False, 'grid': False, 'edge': False, 'device': 'cuda:0'}
+{'num_workers': 24, 'dataset': 'voc2012', 'train_list': 'voc12/train.txt', 'val_list': 'voc12/val.txt', 'trainval_list': 'voc12/trainval.txt', 'voc12_root': '../Dataset/VOC2012', 'depth_root': '../result/depth_img', 'cam_root': '../irn_result/cam', 'infer_list': 'voc12/val.txt', 'chainer_eval_set': 'train', 'rgbd': True, 'cam_network': 'net.resnet50_cam', 'cam_batch_size': 32, 'cam_num_epoches': 50, 'cam_learning_rate': 0.05, 'cam_weight_decay': 0.0001, 'cam_eval_thres': 0.15, 'cam_scales': (1.0, 0.5, 1.5, 2.0), 'conf_fg_thres': 0.3, 'conf_bg_thres': 0.05, 'irn_network': 'net.resnet50_irn', 'irn_crop_size': 512, 'irn_batch_size': 16, 'irn_num_epoches': 5, 'irn_learning_rate': 0.05, 'irn_weight_decay': 0.0001, 'crop_resize': (512, 512), 'beta': 10, 'exp_times': 8, 'ins_seg_bg_thres': 0.25, 'sem_seg_bg_thres': 0.25, 'log_name': 'sample_train_eval', 'cam_weights_name': '../sess/voc_sess/resnet50_cam', 'crop_cam_weights_name': '../sess/voc_sess/resnet50_crop_cam', 'rgbd_cam_weights_name': '../sess/voc_sess/resnet50_rgbd_cam', 'irn_weights_name': '../sess/voc_sess/resnet50_irn', 'crop_irn_weights_name': '../sess/voc_sess/resnet50_crop_irn', 'rgbd_cam_out_dir': '../irn_result/rgbd_cam', 'grid_cam_out_dir': '../irn_result/grid_cam', 'crop_cam_out_dir': '../irn_result/crop_cam', 'cam_out_dir': '../irn_result/cam', 'ir_label_out_dir': '../irn_result/ir_label', 'crop_ir_label_out_dir': '../irn_result/crop_ir_label', 'sem_seg_out_dir': '../irn_result/sem_seg', 'crop_sem_seg_out_dir': '../irn_result/crop_sem_seg', 'edge_sem_seg_out_dir': '../irn_result/edge_sem_seg', 'edge_out_dir': '../result/edge_map', 'train_cam_pass': True, 'make_cam_pass': True, 'eval_cam_pass': False, 'cam_to_ir_label_pass': False, 'train_irn_pass': False, 'make_sem_seg_pass': False, 'eval_sem_seg_pass': False, 'crop': False, 'grid': False, 'edge': False, 'device': 'cuda:0'}
+RGBD!
+Epoch 1/50
+step:  443/22200 loss:0.1820 imps:41.7 lr: 0.0491
+validating ... loss: 0.2713
+Epoch 2/50
+step:  887/22200 loss:0.2032 imps:18.8 lr: 0.0482
+validating ... loss: 0.2726
+Epoch 3/50
+step: 1331/22200 loss:0.1831 imps:10.5 lr: 0.0473
+validating ... loss: 0.2718
+Epoch 4/50
+step: 1775/22200 loss:0.1749 imps:7.3 lr: 0.0464
+validating ... loss: 0.2698
+Epoch 5/50
+step: 2219/22200 loss:0.1675 imps:5.6 lr: 0.0455
+validating ... loss: 0.2731
+Epoch 6/50
+step: 2663/22200 loss:0.2272 imps:4.5 lr: 0.0446
+validating ... loss: 0.2714
+Epoch 7/50
+step: 3107/22200 loss:0.1829 imps:3.8 lr: 0.0437
+validating ... loss: 0.2737
+Epoch 8/50
+step: 3551/22200 loss:0.2163 imps:3.2 lr: 0.0427
+validating ... loss: 0.2657
+Epoch 9/50
+step: 3995/22200 loss:0.1810 imps:2.8 lr: 0.0418
+validating ... loss: 0.2714
+Epoch 10/50
+step: 4439/22200 loss:0.1883 imps:2.5 lr: 0.0409
+validating ... loss: 0.2697
+Epoch 11/50
+step: 4883/22200 loss:0.1877 imps:2.3 lr: 0.0400
+validating ... loss: 0.2702
+Epoch 12/50
+step: 5327/22200 loss:0.1764 imps:2.1 lr: 0.0391
+validating ... loss: 0.2692
+Epoch 13/50
+step: 5771/22200 loss:0.2081 imps:1.9 lr: 0.0381
+validating ... loss: 0.2681
+Epoch 14/50
+step: 6215/22200 loss:0.2030 imps:1.8 lr: 0.0372
+validating ... loss: 0.2669
+Epoch 15/50
+step: 6659/22200 loss:0.1660 imps:1.6 lr: 0.0363
+validating ... loss: 0.2688
+Epoch 16/50
+step: 7103/22200 loss:0.1929 imps:1.5 lr: 0.0353
+validating ... loss: 0.2706
+Epoch 17/50
+step: 7547/22200 loss:0.1771 imps:1.4 lr: 0.0344
+validating ... loss: 0.2701
+Epoch 18/50
+step: 7991/22200 loss:0.2467 imps:1.4 lr: 0.0335
+validating ... loss: 0.2646
+Epoch 19/50
+step: 8435/22200 loss:0.1747 imps:1.3 lr: 0.0325
+validating ... loss: 0.2703
+Epoch 20/50
+step: 8879/22200 loss:0.1972 imps:1.2 lr: 0.0316
+validating ... loss: 0.2691
+Epoch 21/50
+step: 9323/22200 loss:0.1619 imps:1.2 lr: 0.0306
+validating ... loss: 0.2693
+Epoch 22/50
+step: 9767/22200 loss:0.1791 imps:1.1 lr: 0.0297
+validating ... loss: 0.2681
+Epoch 23/50
+step:10211/22200 loss:0.1719 imps:1.1 lr: 0.0287
+validating ... loss: 0.2685
+Epoch 24/50
+step:10655/22200 loss:0.1643 imps:1.0 lr: 0.0278
+validating ... loss: 0.2719
+Epoch 25/50
+step:11099/22200 loss:0.2478 imps:1.0 lr: 0.0268
+validating ... loss: 0.2692
+Epoch 26/50
+step:11543/22200 loss:0.2379 imps:0.9 lr: 0.0258
+validating ... loss: 0.2673
+Epoch 27/50
+step:11987/22200 loss:0.1775 imps:0.9 lr: 0.0249
+validating ... loss: 0.2688
+Epoch 28/50
+step:12431/22200 loss:0.1679 imps:0.9 lr: 0.0239
+validating ... loss: 0.2700
+Epoch 29/50
+step:12875/22200 loss:0.1925 imps:0.8 lr: 0.0229
+validating ... loss: 0.2687
+Epoch 30/50
+step:13319/22200 loss:0.1990 imps:0.8 lr: 0.0219
+validating ... loss: 0.2672
+Epoch 31/50
+step:13763/22200 loss:0.1685 imps:0.8 lr: 0.0209
+validating ... loss: 0.2695
+Epoch 32/50
+step:14207/22200 loss:0.2045 imps:0.8 lr: 0.0199
+validating ... loss: 0.2669
+Epoch 33/50
+step:14651/22200 loss:0.1974 imps:0.7 lr: 0.0189
+validating ... loss: 0.2682
+Epoch 34/50
+step:15095/22200 loss:0.1834 imps:0.7 lr: 0.0179
+validating ... loss: 0.2691
+Epoch 35/50
+step:15539/22200 loss:0.1876 imps:0.7 lr: 0.0169
+validating ... loss: 0.2701
+Epoch 36/50
+step:15983/22200 loss:0.2443 imps:0.7 lr: 0.0159
+validating ... loss: 0.2675
+Epoch 37/50
+step:16427/22200 loss:0.1820 imps:0.6 lr: 0.0149
+validating ... loss: 0.2696
+Epoch 38/50
+step:16871/22200 loss:0.2239 imps:0.6 lr: 0.0138
+validating ... loss: 0.2690
+Epoch 39/50
+step:17315/22200 loss:0.2056 imps:0.6 lr: 0.0128
+validating ... loss: 0.2691
+Epoch 40/50
+step:17759/22200 loss:0.1893 imps:0.6 lr: 0.0117
+validating ... loss: 0.2694
+Epoch 41/50
+step:18203/22200 loss:0.1692 imps:0.6 lr: 0.0107
+validating ... loss: 0.2685
+Epoch 42/50
+step:18647/22200 loss:0.1836 imps:0.6 lr: 0.0096
+validating ... loss: 0.2684
+Epoch 43/50
+step:19091/22200 loss:0.1762 imps:0.6 lr: 0.0085
+validating ... loss: 0.2694
+Epoch 44/50
+step:19535/22200 loss:0.1905 imps:0.5 lr: 0.0074
+validating ... loss: 0.2697
+Epoch 45/50
+step:19979/22200 loss:0.1987 imps:0.5 lr: 0.0063
+validating ... loss: 0.2674
+Epoch 46/50
+step:20423/22200 loss:0.2028 imps:0.5 lr: 0.0052
+validating ... loss: 0.2693
+Epoch 47/50
+step:20867/22200 loss:0.1935 imps:0.5 lr: 0.0040
+validating ... loss: 0.2685
+Epoch 48/50
+step:21311/22200 loss:0.1695 imps:0.5 lr: 0.0028
+validating ... loss: 0.2689
+Epoch 49/50
+step:21755/22200 loss:0.1711 imps:0.5 lr: 0.0015
+validating ... loss: 0.2696
+Epoch 50/50
+step:22199/22200 loss:0.1418 imps:0.5 lr: 0.0000
+validating ... loss: 0.2695
 RGBD!

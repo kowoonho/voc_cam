@@ -59,6 +59,22 @@ class TorchvisionNormalize():
 
         return proc_img
     
+class TorchvisionNormalizeRGBD():
+    def __init__(self, mean=(0.485, 0.456, 0.406, 0.5), std=(0.229, 0.224, 0.225, 0.5)):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, img):
+        imgarr = np.asarray(img, dtype=np.float32)
+        proc_img = np.empty_like(imgarr)
+
+        for i in range(3):
+            proc_img[..., i] = (imgarr[..., i] / 255. - self.mean[i]) / self.std[i]
+
+        proc_img[..., 3] = (imgarr[..., 3] / 255. - self.mean[3]) / self.std[3]
+
+        return proc_img
+    
 def preprocessing(img, resize_long=(320, 640), rescale = None, img_normal = TorchvisionNormalize(),
                   hor_flip = True, crop_size = 512, to_torch=True):
     if resize_long:
@@ -441,7 +457,7 @@ class VOC12_DepthDataset(VOC12_Dataset):
 
 class VOC12_DepthClassificationDataset(VOC12_DepthDataset):
     def __init__(self, img_name_list_path, voc12_root, depth_root, resize_long=None, rescale=None,
-                 img_normal=TorchvisionNormalize(), hor_flip = False, crop_size=None, crop_method=None, to_torch=True):
+                 img_normal=TorchvisionNormalizeRGBD(), hor_flip = False, crop_size=None, crop_method=None, to_torch=True):
         super().__init__(img_name_list_path, voc12_root, depth_root)
         self.resize_long = resize_long
         self.rescale = rescale
@@ -484,7 +500,7 @@ class VOC12_DepthClassificationDataset(VOC12_DepthDataset):
         
 
 class VOC12_DepthClassificationDatasetMSF(VOC12_DepthClassificationDataset):
-    def __init__(self, img_name_list_path, voc12_root, depth_root, img_normal=TorchvisionNormalize(),
+    def __init__(self, img_name_list_path, voc12_root, depth_root, img_normal=TorchvisionNormalizeRGBD(),
                  scales=(1.0,)):
         self.scales = scales
         super().__init__(img_name_list_path, voc12_root, depth_root, img_normal=img_normal)
