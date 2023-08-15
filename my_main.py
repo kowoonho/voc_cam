@@ -23,7 +23,7 @@ def main_process():
                             help="voc12/train_aug.txt to train a fully supervised model, "
                                 "voc12/train.txt or voc12/val.txt to quickly check the quality of the labels.")
         parser.add_argument("--chainer_eval_set", default="train", type=str)
-        parser.add_argument("--rgbd", default=True, type=str)
+        parser.add_argument("--rgbd", default=False, type=str)
         
 
         # Class Activation Map
@@ -84,7 +84,7 @@ def main_process():
 
         # step
         parser.add_argument("--train_cam_pass", default=True)
-        parser.add_argument("--make_cam_pass", default=True)
+        parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=False)
         parser.add_argument("--train_irn_pass", default=False)
@@ -92,7 +92,7 @@ def main_process():
         parser.add_argument("--eval_sem_seg_pass", default=False)
         
         
-        parser.add_argument("--crop", default=False)
+        parser.add_argument("--crop", default=True)
         parser.add_argument("--grid", default=False)
         parser.add_argument("--edge", default=False)
         
