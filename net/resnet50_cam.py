@@ -19,7 +19,7 @@ class Net(nn.Module):
 
         self.classifier = nn.Conv2d(2048, 20, 1, bias=False)
 
-        self.backbone = nn.ModuleList([self.stage1, self.stage2, self.stage3, self. stage4])
+        self.backbone = nn.ModuleList([self.stage1, self.stage2, self.stage3, self.stage4])
         self.newly_added = nn.ModuleList([self.classifier])
 
     def forward(self, x):
@@ -51,7 +51,7 @@ class CAM(Net):
 
     def __init__(self, rgbd=False):
         super(CAM, self).__init__(rgbd)
-
+        
     def forward(self, x):
 
         x = self.stage1(x)
