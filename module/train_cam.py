@@ -80,7 +80,8 @@ def run(args):
 
     criterion = nn.CrossEntropyLoss()
     avg_meter = pyutils.AverageMeter()
-
+    criterion = nn.CrossEntropyLoss()
+    
     timer = pyutils.Timer()
 
     for ep in range(args.cam_num_epoches):
