@@ -79,7 +79,8 @@ def run(args):
     model.train()
 
     avg_meter = pyutils.AverageMeter()
-
+    criterion = nn.CrossEntropyLoss()
+    
     timer = pyutils.Timer()
 
     for ep in range(args.cam_num_epoches):
@@ -93,7 +94,7 @@ def run(args):
             x = model(img)
             if args.crop:
                 label = torch.argmax(label, dim = 1)
-                loss1 = nn.CrossEntropyLoss(x, label)
+                loss1 = criterion(x, label)
             else:
                 loss1 = F.multilabel_soft_margin_loss(x, label)
             
