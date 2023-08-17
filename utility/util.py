@@ -276,6 +276,11 @@ def cam_depth(conf_cam, depth_map):
     mean_depth = np.average(depth_map[indexes])
     
     return mean_depth
+
+def depth_scaling(mean_depth):
+    scale_factor = 2 - (mean_depth // 40) * 0.2
+    
+    return scale_factor
     
     
 

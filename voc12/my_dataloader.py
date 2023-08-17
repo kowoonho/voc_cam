@@ -442,6 +442,47 @@ class VOC12_Depth_Crop(VOC12CamDataset):
         out['crop_boxes'] = crop_boxes
         return out
     
+class VOC12_Depth_CropClassificationDatasetMSF(VOC12_Depth_Crop):
+    def __init__(self, img_name_list_path, voc12_root, cam_root, depth_root, scales = (1.0,)):
+        super().__init__(img_name_list_path, voc12_root, cam_root, depth_root)
+        self.scales = scales
+        
+        self.img_normal = TorchvisionNormalize()
+        """
+        Depth에 따라서 crop_image 확대하거나 축소해서 CAM 구하기
+        """
+
+    def __getitem__(self, idx):
+        out = super().__init__(idx)
+        
+        msf_img_list = []
+
+        for i, crop_img in enumerate(out['crop_images']):
+            ms_img_list = []
+            depth_scale_factor = util.depth_scaling(out['mean_depths'][i])
+            
+            depth_scale_img = imutils.pil_rescale(crop_img, depth_scale_factor, order=3)
+            for s in self.scales:
+                if s == 1:
+                    s_img = depth_scale_img
+                else:
+                    s_img = imutils.pil_rescale(depth_scale_img, s, order=3)
+
+                if self.img_normal:
+                    s_img = self.img_normal(s_img)
+                s_img = imutils.HWC_to_CHW(s_img)
+                ms_img_list.append(np.stack([s_img, np.flip(s_img, -1)], axis = 0))
+            if len(self.scales) == 1:
+                ms_img_list = ms_img_list[0]
+                
+            msf_img_list.append(ms_img_list)
+            
+        out['msf_img_list'] = msf_img_list
+        
+        return out
+        
+        
+    
 class VOC12_DepthDataset(VOC12_Dataset):
     def __init__(self, img_name_list_path, voc12_root, depth_root):
         super().__init__(img_name_list_path, voc12_root)
