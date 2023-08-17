@@ -50,6 +50,7 @@ class Net(nn.Module):
 class CAM(Net):
 
     def __init__(self, rgbd=False):
+        self.rgbd = rgbd
         super(CAM, self).__init__(rgbd)
         
     def forward(self, x):
@@ -65,6 +66,7 @@ class CAM(Net):
         x = F.conv2d(x, self.classifier.weight)
         x = F.relu(x)
 
-        x = x[0] + x[1].flip(-1)
+        if self.rgbd == False:
+            x = x[0] + x[1].flip(-1)
 
         return x
