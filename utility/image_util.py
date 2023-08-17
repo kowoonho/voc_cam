@@ -29,7 +29,7 @@ def image_show(*files, mode='L', idx=(1, 1)):
         if isinstance(file, str) == True:
             img = read_image(file, mode)
         elif isinstance(file, torch.Tensor) == True:
-            img = file
+            img = file.detach()
             if img.shape[0] == 3:
                 img = CHW_to_HWC(np.asarray(img))
             elif img.shape[0] == 1:

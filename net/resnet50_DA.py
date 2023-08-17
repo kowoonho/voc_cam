@@ -17,6 +17,8 @@ class Net(nn.Module):
         self.stage3 = nn.Sequential(self.resnet50.layer3)
         self.stage4 = nn.Sequential(self.resnet50.layer4)
 
+        
+        
         self.classifier = nn.Conv2d(2048, 20, 1, bias=False)
 
         self.backbone = nn.ModuleList([self.stage1, self.stage2, self.stage3, self.stage4])
@@ -35,8 +37,6 @@ class Net(nn.Module):
         x = x.view(-1, 20)
 
         return x
-    
-
 
     def train(self, mode=True):
         for p in self.resnet50.conv1.parameters():
@@ -52,7 +52,6 @@ class Net(nn.Module):
 class CAM(Net):
 
     def __init__(self, rgbd=False):
-        self.rgbd = rgbd
         super(CAM, self).__init__(rgbd)
         
     def forward(self, x):
@@ -68,7 +67,6 @@ class CAM(Net):
         x = F.conv2d(x, self.classifier.weight)
         x = F.relu(x)
 
-        if self.rgbd == False:
-            x = x[0] + x[1].flip(-1)
+        x = x[0] + x[1].flip(-1)
 
         return x

@@ -11,6 +11,7 @@ import voc12.dataloader
 import voc12.my_dataloader
 from misc import pyutils, torchutils
 from tqdm import tqdm
+import torch.nn as nn
 def validate(model, data_loader, args):
     print('validating ... ', flush=True, end='')
 
@@ -77,8 +78,10 @@ def run(args):
     model = model.to(args.device)
     model.train()
 
+    criterion = nn.CrossEntropyLoss()
     avg_meter = pyutils.AverageMeter()
-
+    criterion = nn.CrossEntropyLoss()
+    
     timer = pyutils.Timer()
 
     for ep in range(args.cam_num_epoches):
@@ -90,7 +93,11 @@ def run(args):
             img = pack['img'].to(args.device)
             label = pack['label'].to(args.device)
             x = model(img)
-            loss1 = F.multilabel_soft_margin_loss(x, label)
+            if args.crop:
+                label = torch.argmax(label, dim = 1)
+                loss1 = criterion(x, label)
+            else:
+                loss1 = F.multilabel_soft_margin_loss(x, label)
             
             avg_meter.add({'loss1': loss1.item()})
 
