@@ -306,8 +306,9 @@ def run(args):
             
         else:
             dataset = voc12.my_dataloader.VOC12_Depth_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
-                                                            cam_root = args.cam_root, scales=args.cam_scales)
-            crop_work(model, dataset, args)
+                                                            cam_root = args.cam_root, depth_root = args.depth_root,
+                                                            scales=args.cam_scales)
+            depth_crop_work(model, dataset, args)
     
     else:
         print("RGBD!")
