@@ -200,6 +200,8 @@ def depth_crop_work(model, dataset, args):
                 
                 print(scale_highres_cam.shape)
                 print(scale_strided_cam.shape)
+            print(scale_crop_sizes)
+            print(crop_sizes)
                 
                 
                 
