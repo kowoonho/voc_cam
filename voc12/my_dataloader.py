@@ -412,6 +412,7 @@ class VOC12_Depth_Crop(VOC12CamDataset):
         high_res = out['high_res']
         img = out['img']
         name = out['name']
+        out['size'] = img.shape[:2]
         
         depth_img = image_util.read_image(os.path.join(self.depth_root, name + ".png"))
         
@@ -419,6 +420,7 @@ class VOC12_Depth_Crop(VOC12CamDataset):
         crop_labels = []
         crop_boxes = []
         mean_depths = []
+        crop_sizes = []
         
         label_cat = np.where(label == 1)[0]
         for i in range(len(high_res)):
@@ -431,6 +433,7 @@ class VOC12_Depth_Crop(VOC12CamDataset):
             cropped_label = np.zeros(20)
             cropped_label[label_cat[i]] = 1
             
+            crop_sizes.append(cropped_img.shape[:2])
             crop_boxes.append(crop_box)
             crop_images.append(cropped_img)
             crop_labels.append(cropped_label)
@@ -440,6 +443,7 @@ class VOC12_Depth_Crop(VOC12CamDataset):
         out['crop_images'] = crop_images
         out['crop_labels'] = crop_labels
         out['crop_boxes'] = crop_boxes
+        out['crop_sizes'] = crop_sizes
         return out
     
 class VOC12_Depth_CropClassificationDatasetMSF(VOC12_Depth_Crop):
@@ -448,20 +452,21 @@ class VOC12_Depth_CropClassificationDatasetMSF(VOC12_Depth_Crop):
         self.scales = scales
         
         self.img_normal = TorchvisionNormalize()
-        """
-        Depth에 따라서 crop_image 확대하거나 축소해서 CAM 구하기
-        """
 
     def __getitem__(self, idx):
-        out = super().__init__(idx)
+        out = super().__getitem__(idx)
         
         msf_img_list = []
 
+        scale_crop_sizes = []
+        
         for i, crop_img in enumerate(out['crop_images']):
             ms_img_list = []
             depth_scale_factor = util.depth_scaling(out['mean_depths'][i])
             
             depth_scale_img = imutils.pil_rescale(crop_img, depth_scale_factor, order=3)
+            
+            scale_crop_sizes.append(depth_scale_img.shape[:2])
             for s in self.scales:
                 if s == 1:
                     s_img = depth_scale_img
@@ -476,7 +481,8 @@ class VOC12_Depth_CropClassificationDatasetMSF(VOC12_Depth_Crop):
                 ms_img_list = ms_img_list[0]
                 
             msf_img_list.append(ms_img_list)
-            
+        
+        out['scale_crop_sizes'] = scale_crop_sizes
         out['msf_img_list'] = msf_img_list
         
         return out

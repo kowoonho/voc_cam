@@ -78,9 +78,7 @@ def run(args):
     model = model.to(args.device)
     model.train()
 
-    criterion = nn.CrossEntropyLoss()
     avg_meter = pyutils.AverageMeter()
-    criterion = nn.CrossEntropyLoss()
     
     timer = pyutils.Timer()
 
@@ -93,11 +91,8 @@ def run(args):
             img = pack['img'].to(args.device)
             label = pack['label'].to(args.device)
             x = model(img)
-            if args.crop:
-                label = torch.argmax(label, dim = 1)
-                loss1 = criterion(x, label)
-            else:
-                loss1 = F.multilabel_soft_margin_loss(x, label)
+            
+            loss1 = F.multilabel_soft_margin_loss(x, label)
             
             avg_meter.add({'loss1': loss1.item()})
 
