@@ -83,8 +83,8 @@ def main_process():
         
 
         # step
-        parser.add_argument("--train_cam_pass", default=True)
-        parser.add_argument("--make_cam_pass", default=False)
+        parser.add_argument("--train_cam_pass", default=False)
+        parser.add_argument("--make_cam_pass", default=True)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=False)
         parser.add_argument("--train_irn_pass", default=False)

@@ -305,7 +305,7 @@ def run(args):
             grid_crop_work(model, dataset, args)
             
         else:
-            dataset = voc12.my_dataloader.VOC12_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
+            dataset = voc12.my_dataloader.VOC12_Depth_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
                                                             cam_root = args.cam_root, scales=args.cam_scales)
             crop_work(model, dataset, args)
     
