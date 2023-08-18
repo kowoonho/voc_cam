@@ -12,10 +12,13 @@ def run(args):
 
     preds = []
     for id in tqdm(dataset.ids):
-        if args.crop == False:
-            cls_labels = imageio.imread(os.path.join(args.sem_seg_out_dir, id + '.png')).astype(np.uint8)
-        else:
+        if args.crop == True:
             cls_labels = imageio.imread(os.path.join(args.crop_sem_seg_out_dir, id + '.png')).astype(np.uint8)
+        elif args.depth==True:
+            cls_labels = imageio.imread(os.path.join(args.depth_crop_sem_seg_out_dir, id + '.png')).astype(np.uint8)
+            
+        else:
+            cls_labels = imageio.imread(os.path.join(args.sem_seg_out_dir, id + '.png')).astype(np.uint8)
             
         cls_labels[cls_labels == 255] = 0
         preds.append(cls_labels.copy())

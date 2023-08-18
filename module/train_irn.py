@@ -14,11 +14,14 @@ def run(args):
 
     model = getattr(importlib.import_module(args.irn_network), 'AffinityDisplacementLoss')(
         path_index)
-
-    if args.crop==False:
-    
-        train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
-                                                            label_dir=args.ir_label_out_dir,
+    if args.crop == True:
+        label_dir = args.crop_ir_label_dir
+    elif args.depth == True:
+        label_dir = args.depth_crop_ir_label_dir
+    else:
+        label_dir = args.ir_label_dir
+    train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
+                                                            label_dir=label_dir,
                                                             voc12_root=args.voc12_root,
                                                             depth_root=args.depth_root,
                                                             indices_from=path_index.src_indices,
@@ -28,18 +31,6 @@ def run(args):
                                                             crop_method="random",
                                                             rescale=(0.5, 1.5)
                                                             )
-    else:
-        train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
-                                                          label_dir=args.crop_ir_label_out_dir,
-                                                          voc12_root=args.voc12_root,
-                                                          depth_root=args.depth_root,
-                                                          indices_from=path_index.src_indices,
-                                                          indices_to=path_index.dst_indices,
-                                                          hor_flip=True,
-                                                          crop_size=args.irn_crop_size,
-                                                          crop_method="random",
-                                                          rescale=(0.5, 1.5)
-                                                          )
     train_data_loader = DataLoader(train_dataset, batch_size=args.irn_batch_size,
                                    shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
@@ -120,8 +111,10 @@ def run(args):
 
         model.mean_shift.running_mean = torch.mean(torch.stack(dp_mean_list), dim=0)
     print('done.')
-    if args.crop==False:
-        torch.save(model.state_dict(), args.irn_weights_name + ".pth")
-    else:
+    if args.crop==True:
         torch.save(model.state_dict(), args.crop_irn_weights_name + ".pth")
+    elif args.depth == True:
+        torch.save(model.state_dict(), args.depth_crop_irn_weights_name + ".pth")
+    else:
+        torch.save(model.state_dict(), args.irn_weights_name + ".pth")
         
