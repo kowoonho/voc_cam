@@ -172,18 +172,20 @@ def depth_crop_work(model, dataset, args):
                 scale_crop_size = scale_crop_sizes[idx]
                 org_crop_size = crop_sizes[idx]
                 
-                strided_size = imutils.get_strided_size(scale_crop_size, 4)
-                strided_up_size = imutils.get_strided_up_size(scale_crop_size, 16)
+                scale_strided_size = imutils.get_strided_size(scale_crop_size, 4)
+                scale_strided_up_size = imutils.get_strided_up_size(scale_crop_size, 16)
+                
+                org_strided_size = imutils.get_strided_size(org_crop_size, 4)
                 
                 valid_cat = torch.nonzero(label)[:, 0]
                 
                 outputs = [model(img[0].to(args.device)) for img in msf_img]
                 
                 scale_strided_cam = torch.sum(torch.stack(
-                [F.interpolate(torch.unsqueeze(o, 0), strided_size, mode='bilinear', align_corners=False)[0] for o
+                [F.interpolate(torch.unsqueeze(o, 0), scale_strided_size, mode='bilinear', align_corners=False)[0] for o
                     in outputs]), 0)
                 
-                scale_highres_cam = [F.interpolate(torch.unsqueeze(o, 1), strided_up_size,
+                scale_highres_cam = [F.interpolate(torch.unsqueeze(o, 1), scale_strided_up_size,
                                             mode='bilinear', align_corners=False) for o in outputs]
 
                 
@@ -198,15 +200,15 @@ def depth_crop_work(model, dataset, args):
                 scale_strided_cam = scale_strided_cam[0].cpu().numpy()
                 scale_highres_cam = scale_highres_cam[0].cpu().numpy()
                 
-                print(scale_highres_cam.shape)
+                print(org_strided_size)
                 print(scale_strided_cam.shape)
-            print(scale_crop_sizes)
-            print(crop_sizes)
+                print(scale_crop_size[idx])
+                print(org_crop_size[idx])
                 
                 
                 
 
-            #     strided_cam = image_util.crop_cam_to_org_cam(strided_cam, strided_crop_boxes[idx], strided_org_size)
+                # strided_cam = image_util.crop_cam_to_org_cam(strided_cam, strided_crop_boxes[idx], strided_org_size)
             #     highres_cam = image_util.crop_cam_to_org_cam(highres_cam, crop_boxes[idx], org_size)
                 
             #     cam_list.append(strided_cam)
