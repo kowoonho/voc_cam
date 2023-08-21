@@ -288,8 +288,10 @@ def grid_crop_work(model, dataset, args):
 
 def run(args):
     model = getattr(importlib.import_module(args.cam_network), 'CAM')(args.rgbd)
-    if args.crop == True or args.depth == True:
+    if args.crop == True:
         model.load_state_dict(torch.load(args.crop_cam_weights_name + '.pth'), strict=True)
+    elif args.depth == True:
+        model.load_state_dict(torch.load(args.depth_crop_cam_weights_name + '.pth'), strict=True)
     else:
         model.load_state_dict(torch.load(args.cam_weights_name + '.pth'), strict=True)
         

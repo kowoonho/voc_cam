@@ -37,8 +37,8 @@ def main_process():
                             help="Multi-scale inferences")
 
         # Mining Inter-pixel Relations
-        parser.add_argument("--conf_fg_thres", default=0.30, type=float)
-        parser.add_argument("--conf_bg_thres", default=0.05, type=float)
+        parser.add_argument("--conf_fg_thres", default=0.35, type=float)
+        parser.add_argument("--conf_bg_thres", default=0.10, type=float)
 
         # Inter-pixel Relation Network (IRNet)
         parser.add_argument("--irn_network", default="net.resnet50_irn", type=str)
@@ -92,7 +92,7 @@ def main_process():
 
         # step
         parser.add_argument("--train_cam_pass", default=False)
-        parser.add_argument("--make_cam_pass", default=True)
+        parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=True)
         parser.add_argument("--train_irn_pass", default=False)

@@ -54,6 +54,6 @@ def _work(infer_dataset, args):
         
 
 def run(args):
-    dataset = voc12.dataloader.VOC12ImageDataset(args.trainval_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
+    dataset = voc12.dataloader.VOC12ImageDataset(args.infer_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
     _work(dataset, args)
     
