@@ -17,7 +17,7 @@ def run(args):
     if args.crop == True:
         label_dir = args.crop_ir_label_dir
     elif args.depth == True:
-        label_dir = args.depth_crop_ir_label_dir
+        label_dir = args.depth_crop_ir_label_out_dir
     else:
         label_dir = args.ir_label_dir
     train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,

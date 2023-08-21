@@ -1,0 +1,18 @@
+{'num_workers': 24, 'dataset': 'voc2012', 'train_list': 'voc12/train.txt', 'val_list': 'voc12/val.txt', 'trainval_list': 'voc12/trainval.txt', 'voc12_root': '../Dataset/VOC2012', 'depth_root': '../result/depth_img', 'cam_root': '../irn_result/cam', 'infer_list': 'voc12/val.txt', 'chainer_eval_set': 'train', 'rgbd': False, 'cam_network': 'net.resnet50_cam', 'cam_batch_size': 32, 'cam_num_epoches': 5, 'cam_learning_rate': 0.05, 'cam_weight_decay': 0.0001, 'cam_eval_thres': 0.15, 'cam_scales': (1.0, 0.5, 1.5, 2.0), 'conf_fg_thres': 0.3, 'conf_bg_thres': 0.05, 'irn_network': 'net.resnet50_irn', 'irn_crop_size': 512, 'irn_batch_size': 16, 'irn_num_epoches': 5, 'irn_learning_rate': 0.05, 'irn_weight_decay': 0.0001, 'crop_resize': (512, 512), 'beta': 10, 'exp_times': 8, 'ins_seg_bg_thres': 0.25, 'sem_seg_bg_thres': 0.25, 'log_name': 'sample_train_eval', 'cam_weights_name': '../sess/voc_sess/resnet50_cam', 'crop_cam_weights_name': '../sess/voc_sess/resnet50_crop_cam', 'depth_crop_cam_weights_name': '../sess/voc_sess/resnet50_depth_crop_cam', 'rgbd_cam_weights_name': '../sess/voc_sess/resnet50_rgbd_cam', 'irn_weights_name': '../sess/voc_sess/resnet50_irn', 'crop_irn_weights_name': '../sess/voc_sess/resnet50_crop_irn', 'depth_crop_irn_weights_name': '../sess/voc_sess/resnet50_depth_crop_irn', 'depth_crop_cam_out_dir': '../irn_result/depth_crop_cam', 'rgbd_cam_out_dir': '../irn_result/rgbd_cam', 'grid_cam_out_dir': '../irn_result/grid_cam', 'crop_cam_out_dir': '../irn_result/crop_cam', 'cam_out_dir': '../irn_result/cam', 'ir_label_out_dir': '../irn_result/ir_label', 'crop_ir_label_out_dir': '../irn_result/crop_ir_label', 'depth_crop_ir_label_out_dir': '../irn_result/depth_crop_ir_label', 'sem_seg_out_dir': '../irn_result/sem_seg', 'crop_sem_seg_out_dir': '../irn_result/crop_sem_seg', 'depth_crop_sem_seg_out_dir': '../irn_result/depth_crop_sem_seg', 'edge_sem_seg_out_dir': '../irn_result/edge_sem_seg', 'edge_out_dir': '../result/edge_map', 'train_cam_pass': False, 'make_cam_pass': True, 'eval_cam_pass': False, 'cam_to_ir_label_pass': True, 'train_irn_pass': True, 'make_sem_seg_pass': True, 'eval_sem_seg_pass': True, 'crop': False, 'grid': False, 'edge': False, 'depth': True, 'device': 'cuda:0'}
+Epoch 1/5
+step:  887/ 4440 loss:0.4373 0.3888 3.3651 0.1761 imps:19.9 lr: 0.0409
+Epoch 2/5
+step: 1775/ 4440 loss:0.3982 0.3519 3.0323 0.2024 imps:10.0 lr: 0.0316
+Epoch 3/5
+step: 2663/ 4440 loss:0.3848 0.3389 2.9336 0.1985 imps:6.7 lr: 0.0219
+Epoch 4/5
+step: 3551/ 4440 loss:0.3804 0.3349 2.8871 0.1921 imps:5.0 lr: 0.0118
+Epoch 5/5
+step: 4439/ 4440 loss:0.3767 0.3323 2.8318 0.1856 imps:4.0 lr: 0.0000
+Analyzing displacements mean ... done.
+{'fp': 0.17090033839192997, 'fn': 0.2072848097049967}
+{'iou': array([0.86941374, 0.65330826, 0.34873422, 0.73299203, 0.54532043,
+       0.59197987, 0.78283605, 0.69958354, 0.73959604, 0.30129471,
+       0.75909801, 0.31902085, 0.74036099, 0.67699018, 0.79367152,
+       0.66448266, 0.51489724, 0.79188756, 0.53364179, 0.64478145,
+       0.60181964]), 'miou': 0.6336052749867015}
