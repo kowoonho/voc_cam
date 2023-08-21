@@ -37,8 +37,8 @@ def main_process():
                             help="Multi-scale inferences")
 
         # Mining Inter-pixel Relations
-        parser.add_argument("--conf_fg_thres", default=0.35, type=float)
-        parser.add_argument("--conf_bg_thres", default=0.10, type=float)
+        parser.add_argument("--conf_fg_thres", default=0.3, type=float)
+        parser.add_argument("--conf_bg_thres", default=0.05, type=float)
 
         # Inter-pixel Relation Network (IRNet)
         parser.add_argument("--irn_network", default="net.resnet50_irn", type=str)
@@ -57,7 +57,7 @@ def main_process():
                             help="Hyper-parameter that controls the number of random walk iterations,"
                                 "The random walk is performed 2^{exp_times}.")
         parser.add_argument("--ins_seg_bg_thres", default=0.25)
-        parser.add_argument("--sem_seg_bg_thres", default=0.25)
+        parser.add_argument("--sem_seg_bg_thres", default=0.20)
 
         # Output Path
         parser.add_argument("--log_name", default="sample_train_eval", type=str)
@@ -94,7 +94,7 @@ def main_process():
         parser.add_argument("--train_cam_pass", default=False)
         parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
-        parser.add_argument("--cam_to_ir_label_pass", default=True)
+        parser.add_argument("--cam_to_ir_label_pass", default=False)
         parser.add_argument("--train_irn_pass", default=False)
         parser.add_argument("--make_sem_seg_pass", default=True)
         parser.add_argument("--eval_sem_seg_pass", default=True)
