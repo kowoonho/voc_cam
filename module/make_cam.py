@@ -218,10 +218,10 @@ def depth_crop_work(model, dataset, args):
                 highres_cam_list.append(highres_cam)
             
             cam_stack = np.stack(cam_list)
-            cam_stack = (cam_stack + org_cam) / 2
+            cam_stack = np.maximum(cam_stack, org_cam)
 
             highres_cam_stack = np.stack(highres_cam_list)
-            highres_cam_stack = (highres_cam_stack + org_high_res) / 2
+            highres_cam_stack = np.maximum(highres_cam_stack, org_high_res)
             
             cam_stack = torch.from_numpy(cam_stack)
 

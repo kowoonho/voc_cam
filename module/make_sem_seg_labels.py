@@ -112,7 +112,7 @@ def run(args):
     if args.crop==True:
         model.load_state_dict(torch.load(args.crop_irn_weights_name+".pth"), strict=False)
     elif args.depth == True:
-        model.load_state_dict(torch.load(args.depth_irn_weights_name+".pth"), strict=False)
+        model.load_state_dict(torch.load(args.depth_crop_irn_weights_name+".pth"), strict=False)
         
     else:
         model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
