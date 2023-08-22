@@ -16,7 +16,12 @@ def _work(infer_dataset, args):
     for iter, pack in enumerate(tqdm(infer_data_loader)):
         img_name = voc12.dataloader.decode_int_filename(pack['name'][0])
         img = pack['img'][0].numpy()
-        cam_dict = np.load(os.path.join(args.cam_out_dir, img_name + '.npy'), allow_pickle=True).item()
+        if args.crop == True:
+            cam_dict = np.load(os.path.join(args.crop_cam_out_dir, img_name + '.npy'), allow_pickle=True).item()
+        elif args.depth == True:
+            cam_dict = np.load(os.path.join(args.depth_crop_cam_out_dir, img_name + '.npy'), allow_pickle=True).item()
+        else:
+            cam_dict = np.load(os.path.join(args.cam_out_dir, img_name + '.npy'), allow_pickle=True).item()
         cams = cam_dict['high_res']
         
         keys = np.pad(cam_dict['keys'] + 1, (1, 0), mode='constant')
@@ -37,15 +42,18 @@ def _work(infer_dataset, args):
         conf[fg_conf == 0] = 255
         conf[bg_conf + fg_conf == 0] = 0
 
-        if args.crop==False:
-            imageio.imwrite(os.path.join(args.ir_label_out_dir, img_name + '.png'),
+        if args.crop==True:
+            imageio.imwrite(os.path.join(args.crop_ir_label_out_dir, img_name + '.png'),
+                            conf.astype(np.uint8))
+        elif args.depth==True:
+            imageio.imwrite(os.path.join(args.depth_crop_ir_label_out_dir, img_name + '.png'),
                             conf.astype(np.uint8))
         else:
-            imageio.imwrite(os.path.join(args.crop_ir_label_out_dir, img_name + '.png'),
+            imageio.imwrite(os.path.join(args.ir_label_out_dir, img_name + '.png'),
                             conf.astype(np.uint8))
         
 
 def run(args):
-    dataset = voc12.dataloader.VOC12ImageDataset(args.trainval_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
+    dataset = voc12.dataloader.VOC12ImageDataset(args.infer_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
     _work(dataset, args)
     

@@ -241,15 +241,19 @@ def generate_random_color():
 
     return color
     
-def random_color_mask(mask):
+def random_color_mask(mask, color_list = None):
     (w, h) = mask.shape
     gen_mask = np.zeros((w, h, 3), dtype=np.uint8)
     
     unique_values = np.unique(mask)
     
     for value in unique_values:
-        if value == 0: continue
-        random_color = generate_random_color()
+        if value == 0 or value == 255: continue
+        
+        if color_list == None:
+            random_color = generate_random_color()
+        else:
+            random_color = color_list[value - 1]
         index = np.where(mask == value)
         gen_mask[index] = random_color
     

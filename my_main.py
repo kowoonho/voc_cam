@@ -37,7 +37,7 @@ def main_process():
                             help="Multi-scale inferences")
 
         # Mining Inter-pixel Relations
-        parser.add_argument("--conf_fg_thres", default=0.30, type=float)
+        parser.add_argument("--conf_fg_thres", default=0.3, type=float)
         parser.add_argument("--conf_bg_thres", default=0.05, type=float)
 
         # Inter-pixel Relation Network (IRNet)
@@ -57,25 +57,33 @@ def main_process():
                             help="Hyper-parameter that controls the number of random walk iterations,"
                                 "The random walk is performed 2^{exp_times}.")
         parser.add_argument("--ins_seg_bg_thres", default=0.25)
-        parser.add_argument("--sem_seg_bg_thres", default=0.25)
+        parser.add_argument("--sem_seg_bg_thres", default=0.20)
 
         # Output Path
         parser.add_argument("--log_name", default="sample_train_eval", type=str)
         parser.add_argument("--cam_weights_name", default="../sess/voc_sess/resnet50_cam", type=str)
         parser.add_argument("--crop_cam_weights_name", default="../sess/voc_sess/resnet50_crop_cam", type=str)
+        parser.add_argument("--depth_crop_cam_weights_name", default="../sess/voc_sess/resnet50_depth_crop_cam", type=str)
         parser.add_argument("--rgbd_cam_weights_name", default="../sess/voc_sess/resnet50_rgbd_cam", type=str)
         
         parser.add_argument("--irn_weights_name", default="../sess/voc_sess/resnet50_irn", type=str)
         parser.add_argument("--crop_irn_weights_name", default="../sess/voc_sess/resnet50_crop_irn", type=str)
+        parser.add_argument("--depth_crop_irn_weights_name", default="../sess/voc_sess/resnet50_depth_crop_irn", type=str)
         
+        
+        parser.add_argument("--depth_crop_cam_out_dir", default="../irn_result/depth_crop_cam", type=str)
         parser.add_argument("--rgbd_cam_out_dir", default="../irn_result/rgbd_cam", type=str)
         parser.add_argument("--grid_cam_out_dir", default="../irn_result/grid_cam", type=str)
         parser.add_argument("--crop_cam_out_dir", default="../irn_result/crop_cam", type=str)
         parser.add_argument("--cam_out_dir", default="../irn_result/cam", type=str)
+        
         parser.add_argument("--ir_label_out_dir", default="../irn_result/ir_label", type=str)
         parser.add_argument("--crop_ir_label_out_dir", default="../irn_result/crop_ir_label", type=str)
+        parser.add_argument("--depth_crop_ir_label_out_dir", default="../irn_result/depth_crop_ir_label", type=str)
+        
         parser.add_argument("--sem_seg_out_dir", default="../irn_result/sem_seg", type=str)
         parser.add_argument("--crop_sem_seg_out_dir", default="../irn_result/crop_sem_seg", type=str)
+        parser.add_argument("--depth_crop_sem_seg_out_dir", default="../irn_result/depth_crop_sem_seg", type=str)
         parser.add_argument("--edge_sem_seg_out_dir", default="../irn_result/edge_sem_seg", type=str)
         parser.add_argument("--edge_out_dir", default="../result/edge_map", type=str)
         
@@ -84,17 +92,18 @@ def main_process():
 
         # step
         parser.add_argument("--train_cam_pass", default=False)
-        parser.add_argument("--make_cam_pass", default=True)
+        parser.add_argument("--make_cam_pass", default=False)
         parser.add_argument("--eval_cam_pass", default=False)
         parser.add_argument("--cam_to_ir_label_pass", default=False)
         parser.add_argument("--train_irn_pass", default=False)
-        parser.add_argument("--make_sem_seg_pass", default=False)
-        parser.add_argument("--eval_sem_seg_pass", default=False)
+        parser.add_argument("--make_sem_seg_pass", default=True)
+        parser.add_argument("--eval_sem_seg_pass", default=True)
         
         
-        parser.add_argument("--crop", default=True)
+        parser.add_argument("--crop", default=False)
         parser.add_argument("--grid", default=False)
         parser.add_argument("--edge", default=False)
+        parser.add_argument("--depth", default=True)
         
 
         # device
@@ -107,12 +116,19 @@ def main_process():
         os.makedirs(args.grid_cam_out_dir, exist_ok=True)
         os.makedirs(args.crop_cam_out_dir, exist_ok=True)
         os.makedirs(args.cam_out_dir, exist_ok=True)
+        os.makedirs(args.depth_crop_cam_out_dir, exist_ok=True)
+        
+        
         os.makedirs(args.ir_label_out_dir, exist_ok=True)
         os.makedirs(args.crop_ir_label_out_dir, exist_ok=True)
+        os.makedirs(args.depth_crop_ir_label_out_dir, exist_ok=True)
+        
         os.makedirs(args.sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.crop_sem_seg_out_dir, exist_ok=True)
+        os.makedirs(args.depth_crop_sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.edge_sem_seg_out_dir, exist_ok=True)
         os.makedirs(args.edge_out_dir, exist_ok=True)
+        
     
         
 
@@ -148,6 +164,7 @@ def main_process():
             import module.make_sem_seg_labels
             
             module.make_sem_seg_labels.run(args)
+            
         if args.eval_sem_seg_pass:
             import module.eval_sem_seg
             

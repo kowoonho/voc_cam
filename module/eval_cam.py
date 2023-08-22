@@ -11,10 +11,12 @@ def run(args):
 
     preds = []
     for id in tqdm(dataset.ids):
-        if args.crop == False:
-            cam_dict = np.load(os.path.join(args.cam_out_dir, id + '.npy'), allow_pickle=True).item()
-        else:
+        if args.crop == True:
             cam_dict = np.load(os.path.join(args.crop_cam_out_dir, id + '.npy'), allow_pickle=True).item()
+        elif args.depth == True:
+            cam_dict = np.load(os.path.join(args.depth_crop_cam_out_dir, id + '.npy'), allow_pickle=True).item()
+        else:
+            cam_dict = np.load(os.path.join(args.cam_out_dir, id + '.npy'), allow_pickle=True).item()
         cams = cam_dict['high_res']
         cams = np.pad(cams, ((1, 0), (0, 0), (0, 0)), mode='constant', constant_values=args.cam_eval_thres)
         keys = np.pad(cam_dict['keys'] + 1, (1, 0), mode='constant')

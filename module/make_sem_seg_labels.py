@@ -53,10 +53,13 @@ def _work(model, dataset, args):
 
             rw_pred = keys[rw_pred]
 
-            if args.crop==False:
-                imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
-            else:
+            if args.crop==True:
                 imageio.imsave(os.path.join(args.crop_sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
+            elif args.depth == True:
+                imageio.imsave(os.path.join(args.depth_crop_sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
+                
+            else:
+                imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
                 
 def edge_work(model, dataset, args):
 
@@ -106,10 +109,13 @@ def edge_work(model, dataset, args):
 def run(args):
     model = getattr(importlib.import_module(args.irn_network), 'EdgeDisplacement')()
     
-    if args.crop==False:
-        model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
-    else:
+    if args.crop==True:
         model.load_state_dict(torch.load(args.crop_irn_weights_name+".pth"), strict=False)
+    elif args.depth == True:
+        model.load_state_dict(torch.load(args.depth_crop_irn_weights_name+".pth"), strict=False)
+        
+    else:
+        model.load_state_dict(torch.load(args.irn_weights_name+".pth"), strict=False)
         
     model.eval()
 

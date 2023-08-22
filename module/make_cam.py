@@ -13,6 +13,7 @@ import voc12.my_dataloader
 from misc import torchutils, imutils
 from tqdm import tqdm
 from utility import image_util
+import cv2
 cudnn.enabled = True
 
 def _work(model, dataset, args):
@@ -196,34 +197,36 @@ def depth_crop_work(model, dataset, args):
                 
                 scale_strided_cam = scale_strided_cam[valid_cat]
                 scale_strided_cam /= F.adaptive_max_pool2d(scale_strided_cam, (1, 1)) + 1e-5
-                
+            
                 scale_strided_cam = scale_strided_cam[0].cpu().numpy()
                 scale_highres_cam = scale_highres_cam[0].cpu().numpy()
                 
-                print(org_strided_size)
-                print(scale_strided_cam.shape)
-                print(scale_crop_size[idx])
-                print(org_crop_size[idx])
                 
                 
+                org_strided_size = tuple(int(t.item()) for t in org_strided_size)
+                org_crop_size = tuple(int(t.item()) for t in org_crop_size)
+                
+                strided_cam = cv2.resize(scale_strided_cam, org_strided_size, interpolation = cv2.INTER_LINEAR)
+                highres_cam = cv2.resize(scale_highres_cam, org_crop_size, interpolation=cv2.INTER_LINEAR)
                 
 
-                # strided_cam = image_util.crop_cam_to_org_cam(strided_cam, strided_crop_boxes[idx], strided_org_size)
-            #     highres_cam = image_util.crop_cam_to_org_cam(highres_cam, crop_boxes[idx], org_size)
+
+                strided_cam = image_util.crop_cam_to_org_cam(strided_cam, strided_crop_boxes[idx], strided_org_size)
+                highres_cam = image_util.crop_cam_to_org_cam(highres_cam, crop_boxes[idx], org_size)
                 
-            #     cam_list.append(strided_cam)
-            #     highres_cam_list.append(highres_cam)
+                cam_list.append(strided_cam)
+                highres_cam_list.append(highres_cam)
             
-            # cam_stack = np.stack(cam_list)
-            # cam_stack = (cam_stack + org_cam) / 2
+            cam_stack = np.stack(cam_list)
+            cam_stack = np.maximum(cam_stack, org_cam)
 
-            # highres_cam_stack = np.stack(highres_cam_list)
-            # highres_cam_stack = (highres_cam_stack + org_high_res) / 2
+            highres_cam_stack = np.stack(highres_cam_list)
+            highres_cam_stack = np.maximum(highres_cam_stack, org_high_res)
             
-            # cam_stack = torch.from_numpy(cam_stack)
+            cam_stack = torch.from_numpy(cam_stack)
 
-            # np.save(os.path.join(args.depth_crop_cam_out_dir, img_name + '.npy'),
-            #         {"keys": key, "cam" : cam_stack, "high_res": highres_cam_stack})
+            np.save(os.path.join(args.depth_crop_cam_out_dir, img_name + '.npy'),
+                    {"keys": key, "cam" : cam_stack, "high_res": highres_cam_stack})
 
 def grid_crop_work(model, dataset, args):
     data_loader = DataLoader(dataset, shuffle=False, num_workers=args.num_workers, pin_memory=False)
@@ -285,39 +288,32 @@ def grid_crop_work(model, dataset, args):
 
 def run(args):
     model = getattr(importlib.import_module(args.cam_network), 'CAM')(args.rgbd)
-    if args.rgbd == False:
-        if args.crop == False or args.grid == True:
-            model.load_state_dict(torch.load(args.cam_weights_name + '.pth'), strict=True)
-        
-        else:
-            model.load_state_dict(torch.load(args.crop_cam_weights_name + '.pth'), strict=True)
+    if args.crop == True:
+        model.load_state_dict(torch.load(args.crop_cam_weights_name + '.pth'), strict=True)
+    elif args.depth == True:
+        model.load_state_dict(torch.load(args.depth_crop_cam_weights_name + '.pth'), strict=True)
     else:
-        model.load_state_dict(torch.load(args.rgbd_cam_weights_name + '.pth'), strict=True)
+        model.load_state_dict(torch.load(args.cam_weights_name + '.pth'), strict=True)
+        
     model.eval()
     
     
-    if args.rgbd == False:
-        if args.crop == False and args.grid == False:
-            dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.trainval_list,
-                                                                    voc12_root=args.voc12_root, scales=args.cam_scales)
-            _work(model, dataset, args)
-            
-        elif args.grid==True:
-            print("Make Grid Crop Cam!")
-            dataset = voc12.my_dataloader.VOC12_GridCropImageDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
-                                                                        scales = args.cam_scales)
-            grid_crop_work(model, dataset, args)
-            
-        else:
-            dataset = voc12.my_dataloader.VOC12_Depth_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
-                                                            cam_root = args.cam_root, depth_root = args.depth_root,
-                                                            scales=args.cam_scales)
-            depth_crop_work(model, dataset, args)
-    
+    if args.crop == True:
+
+        dataset = voc12.my_dataloader.VOC12_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
+                                                                            cam_root = args.cam_root, scales = args.cam_scales)
+        
+        crop_work(model, dataset, args)
+        
+    elif args.depth == True:
+        dataset = voc12.my_dataloader.VOC12_Depth_CropClassificationDatasetMSF(args.trainval_list, voc12_root = args.voc12_root,
+                                                        cam_root = args.cam_root, depth_root = args.depth_root,
+                                                        scales=args.cam_scales)
+        depth_crop_work(model, dataset, args)
     else:
-        print("RGBD!")
-        dataset = voc12.my_dataloader.VOC12_DepthClassificationDatasetMSF(args.trainval_list, voc12_root= args.voc12_root,
-                                                                          depth_root=args.depth_root, scales = args.cam_scales)
+        dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.trainval_list,
+                                                                voc12_root=args.voc12_root, scales=args.cam_scales)
         _work(model, dataset, args)
         
+
     
